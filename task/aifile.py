@@ -1,7 +1,6 @@
 import os
 import openai
 from django.conf import settings
-from .replace_special_characters import *
 
 # Set the API key
 openai.api_key = settings.OPENAI_API_KEY

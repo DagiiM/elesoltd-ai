@@ -54,13 +54,14 @@ class ChatSession(models.Model):
         ['Partnership','Partnership'],
     ]
     
+    email_address = models.EmailField(blank=True, null=True)
     business_name = models.TextField(null=True,blank=True)
     business_type = models.TextField(null=True,blank=True)
     country = models.TextField(null=True,blank=True)
-    product_service=models.TextField(null=True,blank=True)
-    short_description=models.TextField(null=True,blank=True)
-    years=models.IntegerField(null=True,blank=True)
-    progress=models.TextField(null=True,blank=True)
+    product_service = models.TextField(null=True,blank=True)
+    short_description = models.TextField(null=True,blank=True)
+    years = models.IntegerField(null=True,blank=True)
+    progress = models.TextField(null=True,blank=True)
     
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     uniqueId = models.CharField(null=True,blank=True,unique=True,max_length=100)
