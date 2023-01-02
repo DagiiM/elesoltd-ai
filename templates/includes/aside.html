@@ -1,0 +1,38 @@
+{% load static %}
+<aside class='aside'>
+    <ul>
+      <li class="brand-aside-nav">
+          Brand Logo
+      </li>
+      <li class="profile-card">
+        <img src="{% static 'icons/avatar.svg' %}" alt="avatar" class="profile-card__avatar" />
+        <div class="profile-card__info">
+          <h2 class="profile-card__fullname">John Doe</h2>
+          <p class="profile-card__email">john.doe@example.com</p>
+        </div>
+      </li>
+      
+      <li><a href="#"><i class="icon-account_circle"></i> My Profile</a></li>
+      <li><a><i class="icon-workspaces_filled"></i>Work Space <i class="icon-expand_more"></i></a>
+        <ul>
+          <li><a href="{% url 'creator' %}"><i class="icon-text_fields"></i>Text Space</a></li>
+          <li><a href="{% url 'generate-image' %}"><i class="icon-add_photo_alternate"></i>Image Generator</a></li>
+          <li><a href="{% url 'bg-remover' %}"><i class="icon-brush"></i>Bg Remover</a></li>
+        </ul>
+      </li>
+      <li>
+        <a><i class="icon-attach_money"></i>My Wallet<i class="icon-expand_more"></i></a>
+        <ul>
+          <li><a href="#"><i class="icon-attach_money"></i>Deposit</a></li>
+          <li><a href="#"><i class="icon-money"></i>Money Transfer</a></li>
+          <li><a href="#"><i class="icon-attach_money"></i>Withdraw</a></li>
+        </ul>
+      </li>
+
+    </ul>
+    <ul>
+      <li><a href="{% url 'support_request' %}"><i class="icon-support_agent"></i>Customer Support</a></li>
+      <li ><a href="{% url 'privacy_policy' %}" style="padding-top:1px;padding-bottom:1px "><i class="icon-link"></i>Privacy Policy</a></li>
+      <li><a href="{% url 'terms_conditions' %}"><i class="icon-link"></i>Terms & Conditions</a></li>
+    </ul>
+</aside>

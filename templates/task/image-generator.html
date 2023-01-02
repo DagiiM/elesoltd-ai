@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="image-gallary-container">
+<section class="image-gallery">
+
+    <div class="image-card">
+      <img src="{% static 'icons/avatar.svg'%}" alt="image 1" class="image-card__image" />
+      <button class="image-card__download-button"><i class="icon-file_download"></i></button>
+    </div>
+    <div class="image-card">
+      <img src="{% static 'icons/avatar.svg'%}" alt="image 2" class="image-card__image" />
+      <button class="image-card__download-button"><i class="icon-file_download"></i></button>
+    </div>
+
+</section>
+
+<div class="chatbot-form">
+<form method="POST" action="{% url 'generate-image' %}" enctype="application/x-www-form-urlencoded" id="chatbot-form">
+    {% csrf_token %}
+    <input type="text" name="message" id='content-request' placeholder="Create a beautiful image from Text" autofocus required autocomplete='off'>
+    <button type="submit"><span id="submit-button-text">Start</span><img src="{% static 'icons/ripple.svg' %}" id="loading-indicator" alt="sending Request"/></button>
+  </form>
+</div>
+</div>
+  <script>
+    
+    const form = document.querySelector('#chatbot-form');
+    const imageGallery = document.querySelector('.image-gallery');
+    const inputField = document.querySelector('#content-request');
+    const buttonText = document.getElementById('submit-button-text');
+    const loadingIndicator = document.querySelector('#loading-indicator');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault(); 
+          // Prevent the form from submitting
+          // Get the value of the input field
+          const inputValue = inputField.value;
+
+          // Check if the input value is empty
+          if (inputValue.trim() === '') {
+            // If the input value is empty, show an error message and return
+            alert('Input field cannot be empty!');
+            return;
+          }
+        
+          const formData = new FormData(form);
+          
+      fetch("{% url 'generate-image'%}", { method: 'POST',body: formData })
+        .then((response) => response.json())
+        .then((data) => {
+          // When the response is received, hide the loading indicator
+          loadingIndicator.style.display = 'none';
+          buttonText.style.display = 'block';
+
+          data = data.response.data;
+          // Clear the image gallery
+          imageGallery.innerHTML = '';
+    
+          // Create image cards for the first 2 images
+          const images = data.slice(0, 2);
+          images.forEach((imageUrl) => {
+            const imageCard = document.createElement('div');
+            imageCard.classList.add('image-card');
+            imageCard.innerHTML = `
+              <img src="${imageUrl.url}" alt="image" class="image-card__image" />
+              <button class="image-card__download-button"><i class="icon-file_download"></i></button>
+            `;
+            imageGallery.appendChild(imageCard);
+          });
+    
+          // Add click event listeners to the download buttons
+          const downloadButtons = imageGallery.querySelectorAll('.image-card__download-button');
+          downloadButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+              // Code to download the image goes here
+            });
+          });
+        })
+        .catch((error) =>{
+          loadingIndicator.style.display = 'none';
+          buttonText.style.display = 'block';
+          console.log(error);
+        });
+         // Show the loading indicator
+         loadingIndicator.style.display = 'block';
+         buttonText.style.display = 'none';
+       // Clear all of the form fields
+       form.reset();
+    });
+    
+    </script>
+
+
+{% endblock %}

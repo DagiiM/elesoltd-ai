@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<script type="text/javascript" src="{% static "ckeditor/build/ckeditor.js" %}"></script>
+
+  
+<div class="chatbot-form">
+<form method="POST" action="{% url 'creator' %}" enctype="application/x-www-form-urlencoded" id="chatbot-form">
+    {% csrf_token %}
+  <div class="scrollable-container">
+    <button class="scrollable-item" onclick="copyToInput('List a few blog Ideas.?')">List a few blog Ideas.</button>
+    <button class="scrollable-item" onclick="copyToInput('Steps of Creating a Business Plan.')">Create Me a Business Plan.</button>
+    <button class="scrollable-item" onclick="copyToInput('Create Me a Resume')">Create Me a Resume.</button>
+    <button class="scrollable-item" onclick="copyToInput('Movies to Watch')">Movies to Watch</button>
+  </div>
+  
+    <input type="text" name="message" id="content-request" placeholder="Create something Beautiful" autofocus required autocomplete='off'>
+    <button type="submit"><span id="submit-button-text">Start</span><img src="{% static 'icons/ripple.svg' %}" id="loading-indicator" alt="sending Request"/></button>
+  </form>
+</div>
+  <section class="main-content-container">
+    <section class="chatbot-response-container chatbot-generated-content">
+      <h4><div style="color:var(--brand-color);text-transform:uppercase">AI Generated </div>
+        <button type="button" id="chatbot-generated-content-button">
+        <i class="icon-fullscreen"></i>
+        <i class="icon-close_fullscreen"></i>
+      </button>
+      </h4>
+    <textarea id="chatbot-response-generated" placeholder="AI Generated Content goes here..."></textarea>
+    <div class="chatbox-response-footer">
+        <span class="">Similarity: coming soon</span>
+        <div class="smart-flex">
+          <img src="{% static 'icons/ripple.svg' %}" id="loading-indicator-editor" alt="sending Request"/>
+          <button type="button" id="copy-button-generated"><i class="icon-content_copy"></i></button>
+          <button type="button"><i class="icon-picture_as_pdf"></i></button>
+          <button type="button"><i class="icon-save_alt"></i></button>
+        </div>
+    </div>
+    </section>
+    <section class="chatbot-response-container chatbot-paraphrased-content">
+      <h4>
+        <div style="color:var(--brand-color);text-transform:uppercase">AI Paraphrased </div>
+        <button type="button" id="chatbot-paraphrased-content-button">
+          <i class="icon-fullscreen"></i>
+        <i class="icon-close_fullscreen"></i>
+        </button>
+      </h4>
+      <textarea id="chatbot-response-paraphraser" placeholder="Paraphrased text goes here"></textarea>
+      <div class="chatbox-response-footer">
+        <span class="">Similarity: coming soon</span>
+        <div class="smart-flex">
+          <button type="button" id="copy-button-paraphrased"><i class="icon-content_copy"></i></button>
+          <button type="button"><i class="icon-picture_as_pdf"></i></button>
+          <button type="button"><i class="icon-save_alt"></i></button>
+        </div>
+    </div>
+      </section>
+</section>
+
+  <script>
+    let paraphraser_editor;
+    let generator_editor;
+
+    ClassicEditor
+    .create(document.querySelector('#chatbot-response-generated'))
+    .then( newEditor => {
+      generator_editor = newEditor;
+    } )
+    .catch(error => {
+        console.log(error);
+    });
+    ClassicEditor
+    .create(document.querySelector('#chatbot-response-paraphraser'))
+    .then( newEditor => {
+      paraphraser_editor = newEditor;
+    } )
+    .catch(error => {
+        console.log(error);
+    });
+
+    const form = document.getElementById('chatbot-form');
+    const buttonText = document.getElementById('submit-button-text');
+    const loadingIndicator = document.querySelector('#loading-indicator');
+    const loadingIndicatorEditor = document.querySelector('#loading-indicator-editor');
+    const inputField = document.querySelector('#content-request');
+    
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      // Get the value of the input field
+      const inputValue = inputField.value;
+
+      // Check if the input value is empty
+      if (inputValue.trim() === '') {
+        // If the input value is empty, show an error message and return
+        alert('Input field cannot be empty!');
+        return;
+      }
+    
+      const formData = new FormData(form);
+    
+      fetch("{% url 'creator' %}", {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          // When the response is received, hide the loading indicator
+          loadingIndicator.style.display = 'none';
+          loadingIndicatorEditor.style.display = 'none';
+          buttonText.style.display = 'block';
+          // Processing Data
+            generator_editor.setData(data.response);
+        }).catch((error)=>{
+          loadingIndicator.style.display = 'none';
+          loadingIndicatorEditor.style.display = 'none';
+          buttonText.style.display = 'block';
+          // Handle the error here
+          console.log(error)
+        });
+        // Show the loading indicator
+        loadingIndicator.style.display = 'block';
+        loadingIndicatorEditor.style.display = 'block';
+        buttonText.style.display = 'none';
+      // Clear all of the form fields
+      form.reset();
+    });
+    
+      function copyToInput(text) {
+        document.getElementById('content-request').value = text;
+      }
+
+    // clipboard
+    function copyToClipboard(text) {
+      try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            return 'Text copied to clipboard';
+           } 
+          catch (error) {
+            return 'Error copying text to clipboard';
+          }
+      }
+      function showAlert(title, message) {
+        let alert = document.querySelector('.alert-text');
+        alert.innerText = message;
+        const modal = document.querySelector('.modal');
+              modal.style.display = 'block';
+              setTimeout(() => {
+                modal.style.display = 'none';
+              }, 1000);
+      }
+
+      document.getElementById('copy-button-generated').addEventListener('click', () => {
+        result = copyToClipboard(generator_editor.getData());
+        showAlert('success',result);
+      });
+      document.getElementById('copy-button-paraphrased').addEventListener('click', () => {
+        result = copyToClipboard(paraphraser_editor.getData());
+        showAlert('success',result);
+      });
+
+      // 
+    const paraphrasedContent = document.querySelector('.chatbot-paraphrased-content');
+    const generatedContent = document.querySelector('.chatbot-generated-content');
+    const paraphrasedContentText = document.querySelector('#chatbot-paraphrased-content-button');
+    const generatedContentText = document.querySelector('#chatbot-generated-content-button');
+   //
+   const fullscreen = document.querySelector('.icon-fullscreen');
+   const closeFullscreen = document.querySelector('.icon-close_fullscreen');
+
+    paraphrasedContentText.addEventListener('click', () => {
+      paraphrasedContent.style.width = 'var(--expanded-content-width)';
+      generatedContent.style.width = 'var(--minimized-content-width)';
+      closeFullscreen.style.display = 'none';
+      fullscreen.style.display = 'block';
+    });
+    
+    
+    generatedContentText.addEventListener('click', () => {
+      generatedContent.style.width = 'var(--expanded-content-width)';
+      paraphrasedContent.style.width = 'var(--minimized-content-width)';
+      fullscreen.style.display = 'none';
+      closeFullscreen.style.display = 'block';
+    });
+    
+
+
+  </script>
+
+{% endblock %}
