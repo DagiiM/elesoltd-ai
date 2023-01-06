@@ -1,6 +1,6 @@
 from .models import *
 from django.conf import settings
-import pdfkit
+#import pdfkit
 from django.template.loader import get_template
 import os
 import requests

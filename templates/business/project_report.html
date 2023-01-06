@@ -1,0 +1,213 @@
+<style>
+
+    form .form-nav {
+      /*display: flex;*/
+      justify-content: space-between;
+      margin-bottom: 20px;
+      margin-top:20px
+    }
+    
+    form .form-nav a {
+      font-size: 11px;
+      text-decoration: none;
+      color: #333;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    
+    form .form-nav a.active {
+      background-color: var(--brand-color);
+      color: var(--brand-neutral);
+      border: 1px solid transparent;
+    }
+    
+    form section {
+      display: none;
+    }
+    
+    form section:first-of-type {
+      display: block;
+    }
+  
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      grid-gap: 5px; 
+    }
+    form .form-nav a[data-completed="true"] {
+      background-color: #333;
+      color: #fff;
+    }
+    
+    form .form-nav a[data-completed="false"] {
+      background-color: #ccc;
+      color: #333;
+    }
+    
+    form section h2{
+      color:var(--brand-color);
+      margin-bottom:8px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+</style>
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class='basic-content-container resume-request-container'>
+    <h2> Create a Professional Project Report | Guide </h2>
+
+    <form id="resume-request" action="submit-form.php" method="post">
+        <div class="form-nav grid">
+          <a href="#section1" class="active">1. Introduction</a>
+          <a href="#section2">2. Literature Review</a>
+          <a href="#section3">3. Methodology</a>
+          <a href="#section4">4. Results</a>
+          <a href="#section5">5. Discussion</a>
+          <a href="#section6">6. Conclusion</a>
+          <a href="#section7">7. References</a>
+        </div>
+        
+        <!-- Section 1: Introduction -->
+        <section id="section1">
+          <h2>Section 1: Introduction </h2>
+          <div>
+            <label for="project-title">Project Title:</label><br>
+            <input type="text" id="project-title" name="project-title" placeholder="Enter the title of your project" required>
+          </div>
+          <div>
+            <label for="project-description">Project Description:</label><br>
+            <textarea id="project-description" name="project-description" rows="5" placeholder="Enter a brief description of your project" required></textarea>
+          </div>
+        </section>
+        
+        <!-- Section 2: Literature Review -->
+        <section id="section2">
+          <h2>Section 2: Literature Review</h2>
+          <div>
+            <label for="literature-review">Literature Review:</label><br>
+            <textarea id="literature-review" name="literature-review" rows="5" placeholder="Enter your literature review for the project" required></textarea>
+          </div>
+        </section>
+        
+        <!-- Section 3: Methodology -->
+        <section id="section3">
+          <h2>Section 3: Methodology</h2>
+          <div>
+            <label for="research-methods">Research Methods:</label><br>
+            <textarea id="research-methods" name="research-methods" rows="5" placeholder="Enter the research methods you used for your project" required></textarea>
+          </div>
+        </section>
+        
+        <!-- Section 4: Results -->
+  <section id="section4">
+    <h2>Section 4: Results</h2>
+    <div>
+      <label for="project-results">Project Results:</label><br>
+      <textarea id="project-results" name="project-results" rows="5" placeholder="Enter the results of your project" required></textarea>
+    </div>
+  </section>
+  
+  <!-- Section 5: Discussion -->
+  <section id="section5">
+    <h2>Section 5: Discussion</h2>
+    <div>
+      <label for="project-discussion">Project Discussion:</label><br>
+      <textarea id="project-discussion" name="project-discussion" rows="5" placeholder="Enter the discussion for your project" required></textarea>
+    </div>
+  </section>
+  
+  <!-- Section 6: Conclusion -->
+  <section id="section6">
+    <h2>Section 6: Conclusion</h2>
+    <div>
+      <label for="project-conclusion">Project Conclusion:</label><br>
+      <textarea id="project-conclusion" name="project-conclusion" rows="5" placeholder="Enter your conclusion for the project" required></textarea>
+    </div>
+  </section>
+  
+  <!-- Section 7: References -->
+  <section id="section7">
+    <h2>Section 7: References</h2>
+    <div>
+      <label for="project-references">Project References:</label><br>
+      <textarea id="project-references" name="project-references" rows="5" placeholder="Enter the references for your project" required></textarea>
+    </div>
+    <!-- Submit Button -->
+    <div style='margin:8px auto'>
+        <button type="submit" id="resume-request">
+            <span id='submit-button-text'>Checkout</span>
+            <img src="{% static 'icons/ripple.svg' %}" alt="loading" id="loading-data" style="display:none;">
+          </button>
+      </div>
+  </section>
+  
+</form>
+
+      
+<script>
+    const navLinks = document.querySelectorAll(".form-nav> a");
+   const sections = document.querySelectorAll("form section");
+   
+   // Check whether all required fields in a section are filled out
+   function checkCompletion(section) {
+       const inputs = section.querySelectorAll("input[required], textarea[required]");
+       let completed = true;
+       inputs.forEach(input => {
+         if (input.value === "") {
+           completed = false;
+         }
+       });
+       return completed;
+     }
+   
+   navLinks.forEach(link => {
+     link.addEventListener("click", event => {
+       event.preventDefault();
+       navLinks.forEach(link => link.classList.remove("active"));
+       link.classList.add("active");
+       const target = document.querySelector(link.hash);
+       sections.forEach(section => {
+         if (section === target) {
+           section.style.display = "block";
+         } else {
+           section.style.display = "none";
+         }
+       });
+     });
+   });
+   const form = document.querySelector("form");
+   form.addEventListener("submit", event => {
+     event.preventDefault();
+     const formData = new FormData(form);
+     const data = Object.fromEntries(formData);
+     const options = {
+       method: "POST",
+       body: JSON.stringify(data),
+       headers: {
+         "Content-Type": "application/json"
+       }
+     };
+     fetch("{% url 'project_report' %}", options)
+       .then(response => response.json())
+       .then(result => {
+         console.log(result);
+       });
+   });
+   
+   form.addEventListener("input", event => {
+       const target = event.target;
+       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+         const section = target.closest("section");
+         const navLink = document.querySelector(`.form-nav a[href="#${section.id}"]`);
+         navLink.setAttribute("data-completed", checkCompletion(section));
+       }
+     });
+           
+       </script>
+
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1>Account details</h1>
+    <p>Account number: {{ object.account_number }}</p>
+    <p>Account name: {{ object.name }}</p>
+    <p>Account balance: {{ object.balance }}</p>
+    <a href="{% url 'accounts:account_update' object.pk %}">Update account</a>
+    <form action="{% url 'accounts:account_delete' object.pk %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Delete account">
+    </form>
+{% endblock %}

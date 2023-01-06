@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <h1>Accounts</h1>
+    {% for account in object_list %}
+        <p>Account number: {{ account.account_number }}</p>
+        <p>Account name: {{ account.name }}</p>
+        <p>Account balance: {{ account.balance }}</p>
+        <a href="{% url 'accounts:account_detail' account.pk %}">View account</a>
+    {% endfor %}
+{% endblock %}

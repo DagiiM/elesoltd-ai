@@ -11,11 +11,17 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from django.core.management.base import BaseCommand
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-OPENAI_API_KEY = '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'
+OPENAI_API_KEY = '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'
+
+PAYPAL_CLIENT_ID = 'AZrtUXbRmEtGELjWBgqtUcCZl74MpqRBpazhedo0j7tobuOvRhYoxoco2tt6ORDLCqEiiwAa8hkk3U-e'
+PAYPAL_CLIENT_SECRET = 'EKMpIEwG9svzPR8LvunKZC-3SY5Wybl4gBq174PnfQSP8dIjgD0hVre9LSybYCnLNWgWLg_og_xkztjr'
+PAYPAL_CLIENT_URI ='http://127.0.0.1:8000'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -38,8 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #'rest_framework',
     'task',
     'contact',
+    'authentication',
+    'transactions',
+    'accounts',
+    'wallet',
+    'mails'
 ]
 
 MIDDLEWARE = [
@@ -128,7 +140,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR /'media'
 
 APP_DOMAIN = 'eleso.ltd'
-COMPANY_NAME = 'Eleso Ltd'
+APP_NAME = 'Eleso Ltd'
 
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = 'login'
@@ -139,7 +151,7 @@ EMAIL_HOST_USER = 'localhost'
 EMAIL_HOST_PASSWORD = 'localhost'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_USE_SSL = True
+EMAIL_USE_SSL = False
 EMAIL_SUBJECT_PREFIX = '[Elesocreatorai] '
 EMAIL_USE_REMEMBER_ME = True
 EMAIL_SUPPORT = 'support@'+APP_DOMAIN

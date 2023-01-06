@@ -7,7 +7,11 @@ from .aifile import *
 from .functions import handleWhatsAppChat
 from django.views.decorators.csrf import csrf_exempt
 import json
+from . models import *
+from django.shortcuts import render
+from .models import Order
 
+'''
 def text_p(input_text):
      response = openai.Completion.create(
         model="text-davinci-003",
@@ -27,8 +31,31 @@ def text_p(input_text):
         else:
             return ''
         
-def generate_image_view(request):
+        
+   '''
     
+        
+        
+def text_p(input_text):
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt="Write a creative ad for the following product to run on Facebook aimed at parents:\n\nProduct: Learning Room is a virtual environment to help students from kindergarten to high school excel in school.",
+        temperature=0.5,
+        max_tokens=100,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=0.0
+        )
+    
+    if 'choices' in response:
+        if len(response['choices'])>0: 
+            completions = response['choices'][0]['text'].replace('\n', '<br>')
+            return input_text+completions    
+        else:
+            return 'There was an error Processing your request. Please try again'
+    
+        
+def generate_image_view(request):
     # Get the user's input from the request
     if request.method == 'POST':
         input_text = request.POST['message']
@@ -102,3 +129,51 @@ def whatsAppWebHook(request):
         
         return HttpResponse('success',status=200)
                     
+
+
+from django.shortcuts import render, HttpResponseRedirect
+from .forms import CheckoutForm
+from .models import Order, OrderItem, Address
+
+def checkout(request):
+    if request.method == "POST":
+        form = CheckoutForm(request.POST)
+        if form.is_valid():
+            # Create a new Order object
+            order = Order()
+            order.name = form.cleaned_data["name"]
+            order.email = form.cleaned_data["email"]
+            order.phone = form.cleaned_data["phone"]
+            # Create a new Address object for shipping address
+            shipping_address = Address()
+            shipping_address.street = form.cleaned_data["shipping_street"]
+            shipping_address.city = form.cleaned_data["shipping_city"]
+            shipping_address.state = form.cleaned_data["shipping_state"]
+            shipping_address.zip_code = form.cleaned_data["shipping_zip_code"]
+            shipping_address.save()
+            order.shipping_address = shipping_address
+            # Create a new Address object for billing address
+            billing_address = Address()
+            billing_address.street = form.cleaned_data["billing_street"]
+            billing_address.city = form.cleaned_data["billing_city"]
+            billing_address.state = form.cleaned_data["billing_state"]
+            billing_address.zip_code = form.cleaned_data["billing_zip_code"]
+            billing_address.save()
+            order.billing_address = billing_address
+            order.payment_method = form.cleaned_data["payment_method"]
+            order.total_price = calculate_total_price()  # TODO: Write function to calculate total price
+            order.status = "pending"
+            order.save()
+            # Create a new OrderItem object for each item in the cart
+            for item in get_cart_items():  # TODO: Write function to get items in the cart
+                order_item = OrderItem()
+                order_item.name = item.name
+                order_item.price = item.price
+                order_item.quantity = item.quantity
+                order_item.order = order
+                order_item.save()
+            # Redirect to confirmation page
+            return HttpResponseRedirect("/checkout/confirmation")
+    else:
+        form = CheckoutForm()
+    return render(request, "checkout.html", {"form": form})

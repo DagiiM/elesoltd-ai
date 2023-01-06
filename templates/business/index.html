@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+
+.document-creator-link{
+    padding:calc(var(--pd-inline)*5);
+    margin:calc(var(--pd-inline)*3);
+    color:var(--brand-color);
+    background-color:var(--brand-neutral);
+    max-width:280px;
+    max-height:280px;
+    display:grid;
+    place-items:center;
+    box-shadow: 0.5px 0.5px 3px 3px #ccc;
+    border-radius:4px !important;
+    border:1px solid transparent;
+}
+.document-creator-link:hover,.document-creator-link:focus{
+    background-color: var(--text-white);
+    border:1px solid var(--brand-color);
+    box-shadow: 0 0 0.08cm 0.08cm transparent transparent;
+}
+.document-creator-link h3{
+    font-size:17px;
+    color:var(--text-color);
+    font-weight:400;
+}
+.document-creator-link h3:hover{
+    color:var(--brand-color);
+}
+.document-creator-link i{
+    font-size:50px !important;
+    margin:var(--pd-inline);
+    color:var(--brand-color-alt);
+    text-decoration:none;
+}
+.document-creator-link{
+    text-decoration:none
+}
+</style>
+
+
+<section class='basic-content-container'>
+ <h2>Documents Toolkit</h2>
+ <div class="grid-auto">
+    <a href="{% url 'business_plan' %}" class="document-creator-link">
+        <h3>Create a Business Plan</h3>
+        <i class="icon-note_add"></i>
+    </a>
+
+    <a href="{% url 'resume' %}" class="document-creator-link">
+        <h3>Create a Resume & Cover Letter</h3>
+        <i class="icon-note_add"></i>
+    </a>
+
+    <a href="{% url 'project_proposal' %}" class="document-creator-link">
+        <h3>Create a Project Proposal</h3>
+        <i class="icon-note_add"></i>
+    </a>
+
+    <a href="{% url 'project_report' %}" class="document-creator-link">
+        <h3>Create a Project Report</h3>
+        <i class="icon-note_add"></i>
+    </a>
+<div>
+ </section
+  
+
+{% endblock %}
