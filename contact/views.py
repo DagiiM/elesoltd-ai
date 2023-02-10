@@ -22,7 +22,7 @@ def privacy_policy(request):
 
 def terms_and_conditions(request):
     context = {
-        'company_name':settings.COMPANY_NAME,
+        'company_name':settings.APP_NAME,
         'support_email':settings.EMAIL_SUPPORT
     }
     return render(request, 'contact/terms-conditions.html',context);

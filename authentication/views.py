@@ -3,7 +3,6 @@ from .models import *
 from django.conf import settings
 from django.core.mail import send_mail
 from django.http import HttpRequest,HttpResponse
-from django.contrib.auth import authenticate, login, logout
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import get_user_model
@@ -13,7 +12,10 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User
 from .forms import RegisterForm,LoginForm
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.csrf import csrf_protect
 
 # Create your views here.
 def register(request):
@@ -23,6 +25,8 @@ def register(request):
             # create a new user and redirect to the login page
            
             user = User.objects.create_user(
+                        first_name= form.cleaned_data['first_name'],
+                        last_name= form.cleaned_data['last_name'],
                         username = form.cleaned_data['username'],
                         email = form.cleaned_data['email'],
                         password = form.cleaned_data['password']
@@ -32,22 +36,22 @@ def register(request):
         form = RegisterForm()
     return render(request, 'auth/register.html', {'form': form})
 
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-
+@csrf_protect
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
-        email = form['email']
-        password = form['password']
-        user = authenticate(email='douglas@gmail.com', password='D12345678M')
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-        else:
-           # messages.error(request, 'Invalid email or password')
-            return redirect('login')
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            #email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request,username=username, password=password)
+           
+            if user is not None:
+                print('Authentication successful')
+                login(request, user)
+                return redirect('dashboard')
+            else:
+                return redirect('login')
     else:
         form = LoginForm()
         return render(request, 'auth/login.html', {'form': form})
@@ -119,6 +123,11 @@ def password_reset_done(request):
 def password_reset_complete(request):
     return render(request, 'auth/password_reset_complete.html')
 
+@login_required
 def logout(request):
     logout(request)
     return redirect('login')
+
+@login_required
+def dashboard(request):
+    return render(request, 'auth/dashboard.html')

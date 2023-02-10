@@ -48,10 +48,8 @@ INSTALLED_APPS = [
     'task',
     'contact',
     'authentication',
-    'transactions',
     'accounts',
-    'wallet',
-    'mails'
+    'notifications'
 ]
 
 MIDDLEWARE = [

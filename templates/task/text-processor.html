@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
+<style>
+  main{
+    margin-bottom: var(--chatbox-height);
+  }
 
+</style>
 {% block content %}
 
 <script type="text/javascript" src="{% static "ckeditor/build/ckeditor.js" %}"></script>
@@ -22,7 +27,7 @@
 </div>
   <section class="main-content-container">
     <section class="chatbot-response-container chatbot-generated-content">
-      <h4><div style="color:var(--brand-color);text-transform:uppercase">AI Generated </div>
+      <h4><div style="text-transform:uppercase">AI Generated </div>
         <button type="button" id="chatbot-generated-content-button">
         <i class="icon-fullscreen"></i>
         <i class="icon-close_fullscreen"></i>
@@ -41,7 +46,7 @@
     </section>
     <section class="chatbot-response-container chatbot-paraphrased-content">
       <h4>
-        <div style="color:var(--brand-color);text-transform:uppercase">AI Paraphrased </div>
+        <div style="text-transform:uppercase">AI Paraphrased </div>
         <button type="button" id="chatbot-paraphrased-content-button">
           <i class="icon-fullscreen"></i>
         <i class="icon-close_fullscreen"></i>

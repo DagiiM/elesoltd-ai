@@ -5,7 +5,7 @@ class AccountForm(forms.ModelForm):
     class Meta:
         model = Account
         fields = ['account_number', 'balance']
-        fields = '__all__'
+        #fields = '__all__'
         widgets = {
             'user': forms.HiddenInput()
         }
@@ -13,25 +13,21 @@ class AccountForm(forms.ModelForm):
 class AccountUpdateForm(forms.ModelForm):
     class Meta:
         model = Account
-        fields = ['account_type', 'account_number', 'balance', 'currency', 'transaction_history',
-                  'creation_date', 'status', 'address', 'phone_number', 'language', 'time_zone',
-                  'billing_address', 'payment_methods', 'referral_code', 'occupation', 'income',
-                  'credit_score']
+        fields = ['account_type', 'account_number', 'balance', 'currency',
+                  'creation_date', 'status']
 
 
-class TransactionForm(forms.Form):
-    amount = forms.DecimalField()
-    transaction_type = forms.ChoiceField(choices=[('debit', 'Debit'), ('credit', 'Credit')])
-
-class ScheduledPaymentForm(forms.Form):
-    amount = forms.DecimalField()
-    recipient = forms.CharField()
-    date = forms.DateField()
-    frequency = forms.ChoiceField(choices=[('once', 'Once'), ('weekly', 'Weekly'), ('monthly', 'Monthly')])
+class DepositForm(forms.Form):
+    amount = forms.DecimalField(max_digits=10, decimal_places=2)
+    description = forms.CharField(max_length=200)
+        
+class WithdrawForm(forms.Form):
+    amount = forms.DecimalField(max_digits=10, decimal_places=2)
 
 class TransferForm(forms.Form):
-    amount = forms.DecimalField()
-    recipient = forms.CharField()
+    beneficiary = forms.CharField(max_length=100)
+    amount = forms.DecimalField(max_digits=10, decimal_places=2)
+    description = forms.CharField(max_length=200)
 
 class StatementForm(forms.Form):
     start_date = forms.DateField()

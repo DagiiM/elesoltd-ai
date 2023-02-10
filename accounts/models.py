@@ -1,60 +1,47 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, RegexValidator
+from django.core.validators import RegexValidator
 import random
 import datetime
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from decimal import Decimal
+from django.core.exceptions import ValidationError
+import uuid
+
+class AccountManager(models.Manager):
+    def get_by_natural_key(self,account_number):
+        return self.get(account_number=account_number)
 
 class Account(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     account_type = models.CharField(default='normal',max_length=20)
     account_number = models.CharField(
-        null=True,
+        primary_key=True,
+        unique=True,
         max_length=20,
         validators=[RegexValidator(r'^\d+$', 'Account number must be a number')]
     )
-    balance = models.PositiveIntegerField(default=0,validators=[MinValueValidator(0)])
-    currency = models.CharField(default='KES',max_length=3)
-    transaction_history = models.JSONField(null=True,blank=True,)
-    creation_date = models.DateField(default=datetime.datetime.now)
+    balance = models.DecimalField(decimal_places=2,max_digits=10,default=Decimal('0.00'))
+    max_balance = models.DecimalField(decimal_places=2,max_digits=10,default=Decimal('9999999.00'))
     status = models.CharField(max_length=20, default='active')
-    address = models.CharField(null=True,blank=True,max_length=200)
-    phone_number = models.CharField(null=True,blank=True,max_length=20)
-    language = models.CharField(null=True,blank=True,max_length=20)
-    time_zone = models.CharField(null=True,blank=True,max_length=40)
+    currency = models.CharField(default='KES',max_length=3)
+    creation_date = models.DateField(default=datetime.datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
-    billing_address = models.CharField(null=True,blank=True,max_length=200)
-    payment_methods = models.JSONField(null=True,blank=True,)
-    referral_code = models.CharField(null=True,blank=True,max_length=20)
-
-    occupation = models.CharField(null=True,blank=True,max_length=100)
-    income = models.PositiveIntegerField(default=0,validators=[MinValueValidator(0)])
-    credit_score = models.PositiveIntegerField(default=0,validators=[MinValueValidator(0)])
-    
-    '''
-    contact_preferences = models.JSONField(null=True)
-    security_questions = models.JSONField(null=True)
-    social_media_accounts = models.JSONField(null=True)
-    notification_preferences = models.JSONField(null=True)
-    bank_name = models.CharField(null=True,max_length=100)
-    bank_routing_number = models.CharField(
-        null=True,
-        max_length=20,
-        validators=[RegexValidator(r'^\d+$', 'Routing number must be a number')]
-    )
-    investment_portfolio = models.JSONField(null=True)
-    insurance_coverage = models.JSONField(null=True)
-    
-    '''
-   
-
+    objects = AccountManager()
+ 
     def __str__(self):
         return self.user.username
     
     def add_to_balance(self, amount):
+        self.validate_transaction(amount)
         self.balance += amount
         self.save()
     
     def subtract_from_balance(self, amount):
+        self.validate_transaction(amount)
         self.balance -= amount
         self.save()
     
@@ -68,84 +55,96 @@ class Account(models.Model):
         # If it is not, return the number
         return account_number
 
-    def add_transaction(self, amount, transaction_type, date):
-        transaction = {
-            'amount': amount,
-            'transaction_type': transaction_type,
-            'date': date
-        }
-        self.transaction_history.append(transaction)
-        self.save()
-
-    def transfer(self, recipient, amount, date):
-        if not self.validate_transaction(amount):
-            return 'Insufficient funds'
+    def transfer(self, beneficiary, amount):
+        if self.balance - amount < 0:
+            raise ValidationError("Insufficient funds to complete transaction.")
+        if self == beneficiary:
+            raise ValidationError("Can't transfer money to self.")
         self.subtract_from_balance(amount)
-        recipient.add_to_balance(amount)
-        self.add_transaction(amount, 'transfer', date)
-        recipient.add_transaction(amount, 'transfer', date)
+        beneficiary.add_to_balance(amount)
+        beneficiary.save()
 
     def pay_bill(self, amount, bill):
-        if self.balance < amount:
-            return 'Insufficient funds'
+        self.validate_transaction(amount)
         self.subtract_from_balance(amount)
-        self.add_transaction(amount, f'bill payment ({bill})', datetime.now())
 
     def validate_transaction(self, amount):
-        if self.balance < amount:
-            return False
+        if amount <= 0:
+            raise ValidationError("Amount must be positive")
+        if self.balance + amount > self.max_balance:
+            raise ValidationError("Transaction exceeds account's max balance")
         return True
 
-    def set_recurring_payment(self, recipient, amount, interval):
-        # interval should be a string, e.g. 'weekly', 'monthly'
-        payment = {
-            'recipient': recipient,
-            'amount': amount,
-            'interval': interval
-        }
-        self.recurring_payments.append(payment)
-        self.save()
+    def mini_statement(self,no_of_transactions=15):
+        transactions = Transaction.objects.filter(self).order_by('-date')[:no_of_transactions]
+        return transactions
 
-    def cancel_recurring_payment(self, payment_id):
-        for payment in self.recurring_payments:
-            if payment['id'] == payment_id:
-                self.recurring_payments.remove(payment)
-                self.save()
-                return
-        return 'Payment not found'
+    def generate_statement(self, num_transactions=100, start_date=None, end_date=None):
+        transactions = self.transactions.all()
+        if start_date and end_date:
+            transactions = transactions.filter(date__range=(start_date, end_date))
+        transactions = transactions.order_by('-date')[:num_transactions]
+        return transactions
 
-    def schedule_payment(self, recipient, amount, date):
-        payment = {
-            'recipient': recipient,
-            'amount': amount,
-            'date': date
-        }
-        self.scheduled_payments.append(payment)
-        self.save()
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.account_number = self.generate_account_number()
+        super().save(*args, **kwargs)
+        
+    @receiver(post_save, sender=User)
+    def create_account(sender, instance, created, **kwargs):
+        if created:
+            Account.objects.create(user=instance)
+            
+Account._meta.pk = Account._meta.get_field('account_number')
 
-    def cancel_scheduled_payment(self, payment_id):
-        for payment in self.scheduled_payments:
-            if payment['id'] == payment_id:
-                self.scheduled_payments.remove(payment)
-                self.save()
-                return
-        return 'Payment not found'
+def generate_reference_number():
+    reference_number = str(uuid.uuid4())[:8]
+    while Transaction.objects.filter(reference_number=reference_number).exists():
+        reference_number = str(uuid.uuid4())[:8]
+    return reference_number
 
-    def cancel_scheduled_payment(self, payment_id):
-        for payment in self.scheduled_payments:
-            if payment['id'] == payment_id:
-                self.scheduled_payments.remove(payment)
-                self.save()
-                return
-        return 'Payment not found'
+class Transaction(models.Model):
+    TRANSACTION_TYPE_CHOICES = (
+        ('deposit','Deposit'),
+        ('withdraw','Withdraw'),
+        ('transfer','Transfer'),
+    )    
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions')
+    customer = models.ForeignKey(User, on_delete=models.CASCADE,related_name='customer_transactions',related_query_name='customer_transaction')
+    beneficiary = models.ForeignKey(User, on_delete=models.CASCADE,related_name='beneficiary_transactions',related_query_name='beneficiary_transaction')
 
-    def generate_statement(self, start_date, end_date):
-        statement = {
-            'start_date': start_date,
-            'end_date': end_date,
-            'transactions': []
-        }
-        for transaction in self.transaction_history:
-            if transaction['date'] >= start_date and transaction['date'] <= end_date:
-                statement['transactions'].append(transaction)
-        return statement
+    transaction_type = models.CharField(max_length=10,choices=TRANSACTION_TYPE_CHOICES)
+    payment_method = models.CharField(default='internal',max_length=20)
+    amount = models.DecimalField(decimal_places=2,max_digits=10,default=Decimal('0.00'))
+    description = models.TextField(null=True,blank=True)
+    reference_number = models.CharField(max_length=8, unique=True, default=generate_reference_number, primary_key=True)
+   # status = models.BooleanField(default=True)
+    date = models.DateField(default=datetime.datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    '''
+    charge_id = models.CharField(max_length=100)
+    discount_rate = models.FloatField()
+    tax_rate = models.FloatField()
+    refunded = models.FloatField()
+    '''
+    
+@receiver(post_save,sender=Transaction)
+def update_account_balance(sender,instance,**kwargs):
+    account = instance.account
+    if instance.transaction_type == 'deposit':
+        account.add_to_balance(instance.amount)
+    elif instance.transaction_type == 'transfer':
+        customer = instance.customer.account_set.get()
+        customer.transfer(account,instance.amount)
+    elif instance.transaction_type == 'withdraw':
+        if account.balance < instance.amount:
+            return 'Insufficient funds'
+        else:
+            account.substract_from_balance(instance.amount)
+    account.save()
+
+
+    

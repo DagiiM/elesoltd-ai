@@ -1,40 +1,117 @@
 {% load static %}
 <aside class='aside'>
     <ul>
-      <li class="brand-aside-nav">
-          <img src="" alt="site-logo"/>
-          <span>Eleso Ltd</span>
-      </li>
-      <li class="profile-card">
-        <img src="{% static 'icons/avatar.svg' %}" alt="avatar" class="profile-card__avatar" />
-        <div class="profile-card__info">
-          <h2 class="profile-card__fullname">John Doe</h2>
-          <p class="profile-card__email">john.doe@example.com</p>
-        </div>
+      <li class="brand-aside-nav" style="background-color:transparent">
+
+          <img src="{% static 'icons/logo.png' %}" alt="site-logo" style="width:var(--nav-height);height:var(--nav-height)"/>
+          <span class="text" style="font-size:20px">Eleso Ltd</span>
+
+          <span class="toggle">
+            <i class="icon-keyboard_arrow_right"></i>          
+          </span>
       </li>
       
-      <li><a href="#"><i class="icon-account_circle"></i> My Profile</a></li>
-      <li><a><i class="icon-workspaces_filled"></i>Work Space <i class="icon-expand_more"></i></a>
-        <ul>
-          <li><a href="{% url 'creator' %}"><i class="icon-text_fields"></i>Text Space</a></li>
-          <li><a href="{% url 'generate-image' %}"><i class="icon-add_photo_alternate"></i>Image Generator</a></li>
-          <li><a href="{% url 'bg-remover' %}"><i class="icon-brush"></i>Remove Bg</a></li>
-          <li><a href="{% url 'document' %}"><i class="icon-folder"></i>Doc Toolkit</a></li>
-        </ul>
+      {% if user.is_authenticated %}
+      <li class="profile-card" style="display:none">
+        <img src="{% static 'icons/avatar.svg' %}" alt="avatar" class="profile-card__avatar" />
+        <div class="profile-card__info">
+          <h2 class="profile-card__fullname">{{user.firstname}} {{user.lastname}}</h2>
+          <p class="profile-card__email">{{user.email}}</p>
+        </div>
       </li>
+   {% endif %}
+      
+     
+      <li class="search-box">
+        <a href="#">
+        <i class="icon icon-search"></i> 
+        <input type="search" placeholder="Search..." autocomplete="off"/>
+      </a>
+      </li>
+
       <li>
-        <a><i class="icon-attach_money"></i>My Wallet<i class="icon-expand_more"></i></a>
-        <ul>
-          <li><a href="#"><i class="icon-attach_money"></i>Deposit</a></li>
-          <li><a href="#"><i class="icon-money"></i>Transfer</a></li>
-          <li><a href="#"><i class="icon-attach_money"></i>Withdraw</a></li>
-        </ul>
+        <a href="{% url 'dashboard' %}">
+        <i class="icon icon-home"></i> 
+        <span class="text">Dashboard</span>
+      </a>
       </li>
+
+      <li>
+        <a href="{% url 'notification' %}">
+        <i class="icon icon-notifications_none"></i> 
+        <span class="text">Notifications</span>
+      </a>
+      </li>
+
+        <li>
+          <a href="{% url 'creator' %}">
+            <i class="icon icon-text_fields"></i>
+            <span class="text">Text Space</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="{% url 'generate-image' %}">
+            <i class="icon icon-add_photo_alternate"></i>
+            <span class="text">Image Generator</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="{% url 'bg-remover' %}">
+            <i class="icon icon-brush"></i>
+            <span class="text">Remove Bg</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="{% url 'document' %}">
+            <i class="icon icon-folder"></i>
+            <span class="text">Doc Toolkit</span>
+          </a>
+        </li>
+        
+
+ {% if user.is_authenticated %}
+      <li>
+        <a href="{% url 'accounts:account_list' %}">
+        <i class="icon icon-account_balance_wallet"></i>
+        <span class="text">My Wallet</span>
+      </a>
+    </li>
+
+ {% endif %}
 
     </ul>
     <ul>
-      <li><a href="{% url 'support_request' %}"><i class="icon-support_agent"></i>Customer Support</a></li>
-      <li ><a href="{% url 'privacy_policy' %}" style="padding-top:1px;padding-bottom:1px "><i class="icon-link"></i>Privacy Policy</a></li>
-      <li><a href="{% url 'terms_conditions' %}"><i class="icon-link"></i>Terms & Conditions</a></li>
-    </ul>
+       <li>
+          <a href="{% url 'support_request' %}">
+            <i class="icon icon-support_agent"></i>
+            <span class="text">Support</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="{% url 'support_request' %}">
+            <i class="icon icon-logout"></i>
+            <span class="text">Logout</span>
+          </a>
+        </li>
+
+        <li class="mode">
+
+            <div class="moon-sun">
+              <i class="icon icon-support_agent moon"></i>
+              <i class="icon icon-wb_sunny sun"></i>
+            </div>
+            
+            <span class="mode-text text">Dark Mode</span>
+
+            <div class="toggle-switch">
+              <span class="switch"></span>
+            </div>
+
+        </li>
+
+     </ul>
 </aside>

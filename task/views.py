@@ -10,6 +10,10 @@ import json
 from . models import *
 from django.shortcuts import render
 from .models import Order
+from django.conf import settings
+#import pdfkit
+from django.template.loader import get_template
+import os
 
 '''
 def text_p(input_text):
@@ -39,7 +43,7 @@ def text_p(input_text):
 def text_p(input_text):
     response = openai.Completion.create(
         model="text-davinci-003",
-        prompt="Write a creative ad for the following product to run on Facebook aimed at parents:\n\nProduct: Learning Room is a virtual environment to help students from kindergarten to high school excel in school.",
+        prompt=input_text,
         temperature=0.5,
         max_tokens=100,
         top_p=1.0,

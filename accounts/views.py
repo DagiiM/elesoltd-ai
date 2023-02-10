@@ -1,10 +1,10 @@
-from django.shortcuts import render,redirect, get_object_or_404, reverse
+from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib import messages
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.views.generic import ListView, DetailView
-from .forms import AccountForm, StatementForm, TransactionForm, ScheduledPaymentForm, TransferForm,AccountUpdateForm
-from .models import Account
+from .forms import AccountForm, StatementForm, AccountUpdateForm, DepositForm, WithdrawForm, TransferForm
+from .models import *
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse,JsonResponse
 
 class AccountListView(ListView):
     model = Account
@@ -12,45 +12,19 @@ class AccountListView(ListView):
     template_name = 'accounts/account_list.html'
     paginate_by = 10
 
+
 class AccountDetailView(DetailView):
     model = Account
     context_object_name = 'account'
     template_name = 'accounts/account_detail.html'
-
+   
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = TransactionForm()
+        account = self.get_object()
+        context['transactions'] = account.generate_statement()
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = TransactionForm(request.POST)
-        if form.is_valid():
-            amount = form.cleaned_data['amount']
-            transaction_type = form.cleaned_data['transaction_type']
-            date = form.cleaned_data['date']
-            self.object.add_transaction(amount, transaction_type, date)
-            return redirect('accounts:account_detail', pk=self.object.pk)
-        else:
-            return self.form_invalid(form)
-
-
-
-def create_account(request):
-    if request.method == 'POST':
-        form = AccountForm(request.POST)
-        if form.is_valid():
-            account = form.save(commit=False)
-            account.save()
-            messages.success(request, 'Account created successfully')
-            return redirect(request, 'accounts:account_list')
-        else:
-            messages.error(request, 'Error creating account')
-    else:
-        form = AccountForm()
-    return render(request, 'accounts/create_account.html', {'form': form})
-
-
+@login_required
 def account_update(request, pk):
     account = get_object_or_404(Account, pk=pk)
     if request.method == 'POST':
@@ -68,13 +42,7 @@ def account_update(request, pk):
     # If the user is not authenticated or is not the owner of the account, redirect them
     return redirect('login')
 
-
-def account_delete(request, pk):
-    if request.method == 'POST':
-        get_object_or_404(Account, pk=pk).delete()
-        messages.success(request, 'Account deleted successfully')
-    return redirect(request, 'accounts:account_list')
-
+@login_required
 def generate_statement(request, pk):
     account = get_object_or_404(Account, pk=pk)
     if request.method == 'POST':
@@ -88,37 +56,96 @@ def generate_statement(request, pk):
         form = StatementForm()
     return render(request, 'accounts/generate_statement.html', {'form': form})
 
-def add_scheduled_payment(request, pk):
-    account = get_object_or_404(Account, pk=pk)
+
+@login_required
+def deposit(request):
     if request.method == 'POST':
-        form = ScheduledPaymentForm(request.POST)
+        print('Good')
+        form = DepositForm(request.POST)
         if form.is_valid():
-            recipient = form.cleaned_data['recipient']
+            customer = request.user
+            customer_account = customer.account_set.get()
+            transaction_type = 'deposit' 
+            payment_method = 'mpesa'
             amount = form.cleaned_data['amount']
-            frequency = form.cleaned_data['frequency']
-            payment_id = account.add_scheduled_payment(recipient, amount, frequency)
-            messages.success(request, f'Scheduled payment added with ID: {payment_id}')
-            return redirect(reverse('accounts:account_detail', kwargs={'pk': pk}))
+            description = form.cleaned_data['description']
+            
+            transaction = Transaction.objects.create(
+                customer=customer,
+                beneficiary=customer,
+                account=customer_account,
+                transaction_type=transaction_type,
+                payment_method=payment_method,
+                amount=amount,
+                description=description
+            )
+            context = {
+                'reference_number': transaction.reference_number,
+                'customer': {
+                    'first_name': transaction.customer.first_name,
+                    'last_name': transaction.customer.first_name,
+                },
+                'beneficiary': {
+                    'first_name': transaction.customer.first_name,
+                    'last_name': transaction.customer.first_name,
+                },
+                'amount': transaction.amount,
+                'description': transaction.description
+            }
+            
+            return JsonResponse(context)
     else:
-        form = ScheduledPaymentForm()
-    return render(request, 'accounts/add_scheduled_payment.html', {'form': form})
+        form = DepositForm()
+    return render(request, 'accounts/deposit.html', {'form': form})
 
-def scheduled_payments(request, pk):
-    account = get_object_or_404(Account, pk=pk)
-    scheduled_payments = account.scheduled_payments()
-    return render(request, 'accounts/scheduled_payments.html', {'scheduled_payments': scheduled_payments})
+def withdraw(request):
+    customer = request.user
+    account = customer.account_set.get()
+    if request.method == 'POST':
+        form = WithdrawForm(request.POST)
+        if form.is_valid():
+            
+           return redirect('account_detail', pk=account.pk)
+    else:
+        form = WithdrawForm()
+    return render(request, 'accounts/withdraw.html', {'form': form})
 
-def transfer(request, pk):
-    account = get_object_or_404(Account, pk=pk)
+def transfer(request):
     if request.method == 'POST':
         form = TransferForm(request.POST)
         if form.is_valid():
-            recipient = form.cleaned_data['recipient']
+            customer = request.user
+            transaction_type = 'transfer' 
+            payment_method = 'internal'
             amount = form.cleaned_data['amount']
-            account.transfer(recipient, amount)
-            messages.success(request, 'Transfer successful')
-            return redirect(reverse('accounts:account_detail', kwargs={'pk': pk}))
+            description = form.cleaned_data['description']
+            beneficiary_acccount = Account.objects.get(account_number=form.cleaned_data['beneficiary'])
+            
+            transaction = Transaction.objects.create(
+                customer=customer,
+                beneficiary=beneficiary_acccount.user,
+                account=beneficiary_acccount,
+                transaction_type=transaction_type,
+                payment_method=payment_method,
+                amount=amount,
+                description=description
+            )
+            context = {
+                'transaction': transaction.reference_number,
+                'customer': {
+                    'first_name': transaction.customer.first_name,
+                    'last_name': transaction.customer.first_name,
+                },
+                'beneficiary': {
+                    'first_name': transaction.customer.first_name,
+                    'last_name': transaction.customer.first_name,
+                },
+                'payment_method': payment_method,
+                'amount': transaction.amount,
+                'description': transaction.description
+            }
+            
+            return JsonResponse(context)
     else:
         form = TransferForm()
     return render(request, 'accounts/transfer.html', {'form': form})
-

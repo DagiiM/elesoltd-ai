@@ -21,9 +21,7 @@ urlpatterns = [
     path('', include('task.urls')),
     path('', include('contact.urls')),
     path('', include('business.urls')),
-    path('', include('wallet.urls')),
     path('', include('authentication.urls')),
     path('accounts/', include('accounts.urls')),
-    path('mails/', include('mails.urls', namespace='mails')),
-    path('transactions/', include('transactions.urls')),
+    path('',include('notifications.urls')),
 ]

@@ -2,11 +2,314 @@
 {% load static %}
 
 {% block content %}
-    <h1>Accounts</h1>
-    {% for account in object_list %}
-        <p>Account number: {{ account.account_number }}</p>
-        <p>Account name: {{ account.name }}</p>
-        <p>Account balance: {{ account.balance }}</p>
-        <a href="{% url 'accounts:account_detail' account.pk %}">View account</a>
-    {% endfor %}
+    <section class="wallet-container">
+        <header class="balance-card">
+          <h3>Account Balance</h3>
+          {% for account in object_list %}
+          <div class="" style="display:flex;align-items:center;justify-content:space-between">
+          <p>Account number: {{ account.account_number }}</p>
+          <p class="balance-amount">KES {{ account.balance }}</p>
+        </div>
+          <a href="{% url 'accounts:account_detail' account.pk %}">View account</a>
+        {% endfor %}
+        </header>
+        <div class="wallet-functions-card">
+        <section class="deposit-card">
+          <h3>Deposit</h3>
+          <form action="{% url 'accounts:deposit' %}" method="post" enctype="" class="form">
+            {% csrf_token %}
+            <label for="deposit-payment-method" class="form-label">Select Payment Method:</label>
+            <select id="deposit-payment-method" name="payment-method" required>
+              <option disabled selected>Payment Method</option>
+              <option value="mpesa">MPESA</option>
+              <option value="paypal">PAYPAL</option>
+            </select>
+            <label for="deposit-amount" class="form-label">Enter amount:</label>
+            <input type="number" id="deposit-amount" name="amount" required placeholder="Enter amount" class="form-input">
+            <label for="deposit-description" class="form-label">Enter Description:</label>
+            <input type="text" id="deposit-description" name="description" required placeholder="Enter Description" class="form-input">
+            <button type="submit" class="form-button">Deposit</button>
+          </form>
+        </section>
+        <section class="withdraw-card">
+          <h3>Withdraw</h3>
+          <form action="{% url 'accounts:withdraw' %}" method="post" class="form">
+            {% csrf_token %}
+            <label for="withdraw-payment-method" class="form-label">Select Payment Method:</label>
+            <select id="withdraw-payment-method" name="payment-method">
+              <option disabled selected>Withdrawal Method</option>
+              <option value="mpesa">MPESA</option>
+              <option value="paypal">PAYPAL</option>
+            </select>
+            <label for="withdraw-amount" class="form-label">Enter amount:</label>
+            <input type="number" id="withdraw-amount" name="amount" required placeholder="Enter amount" class="form-input">
+            <label for="withdraw-description" class="form-label">Enter Description:</label>
+            <input type="text" id="withdraw-description" name="description" required placeholder="Enter Description" class="form-input">
+            <button type="submit" class="form-button">Withdraw</button>
+          </form>
+        </section>
+        <section class="transfer-card">
+          <h3>Funds Transfer</h3>
+          <form action="{% url 'accounts:transfer' %}" method="post" class="form">
+            {% csrf_token %}
+            <label for="recipient" class="form-label">Enter recipient:</label>
+            <input type="number" id="recipient" name="beneficiary" required placeholder="Enter recipient" class="form-input">
+            <label for="transfer-amount" class="form-label">Enter amount:</label>
+            <input type="number" id="transfer-amount" name="amount" required placeholder="Enter amount" class="form-input">
+            <label for="transfer-description" class="form-label">Enter Description:</label>
+            <input type="text" id="transfer-description" name="description" required placeholder="Enter Description" class="form-input">
+            
+            <button type="submit" class="form-button">Transfer</button>
+          </form>
+        </section>
+    </div>
+      </section>
+      
+
+      <style>
+        .wallet-functions-card{
+          display:flex;
+          align-items:baseline;
+        }
+        @media (max-width: 768px){
+          .wallet-functions-card{
+            flex-direction:column;
+            width:80%;
+          }
+        }
+        .wallet-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+          }
+          
+          .balance-card {
+            width: 80%;
+            text-align: center;
+            background-color: var(--sidebar-color);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+          }
+          
+          .balance-amount {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+          }
+          
+          .deposit-card, .withdraw-card, .transfer-card {
+            width: 100%;
+            background-color: var(--sidebar-color);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            margin-inline:1%;
+          }
+          aside.close ~ :is(.deposit-card, .withdraw-card, .transfer-card ){
+
+          }
+          .form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+          
+          .form-label {
+            font-size: 18px;
+            margin-top: 10px;
+          }
+          
+  
+          .form-input,select {
+            width: 100%;
+            height: 40px;
+            padding: 10px;
+            font-size: 18px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+          }
+          select {
+            font-size: 15px;
+          }
+          body.dark :is(.form-input,select){
+            background-color: var(--text-color-alt);
+            color: var(--text-color);
+          }
+          
+          .form-button {
+            width: 100%;
+            height: 40px;
+            background-color: var(--brand-color);
+            color: white;
+            font-size: 18px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 10px;
+          }
+          
+          .form-button:hover {
+            background-color: var(--brand-color-alt);
+            cursor: pointer;
+          }
+          
+          
+          
+    </style>
+
+    <script>
+// Define the interface
+interface Transaction {
+  execute: () => Promise<void>;
+}
+
+// Implement the deposit form as a class that implements the Transaction interface
+class Deposit implements Transaction {
+  private depositAmountInput: HTMLInputElement;
+
+  constructor() {
+    this.depositAmountInput = document.querySelector('#deposit-amount');
+  }
+
+  execute = async () => {
+    const depositAmount = this.depositAmountInput.value;
+
+    if (!depositAmount) {
+      alert('Please enter a valid deposit amount');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('depositAmount', depositAmount);
+
+    try {
+      const response = await fetch('/accounts/deposit', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to deposit funds');
+      }
+
+      const data = await response.json();
+      alert(`Successfully deposited $${data.depositAmount}`);
+      this.depositAmountInput.value = '';
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while depositing funds');
+    }
+  };
+}
+
+// Implement the withdraw form and transfer form in a similar manner
+class Withdraw implements Transaction {
+  private withdrawAmountInput: HTMLInputElement;
+
+  constructor() {
+    this.withdrawAmountInput = document.querySelector('#withdraw-amount');
+  }
+
+  execute = async () => {
+    const withdrawAmount = this.withdrawAmountInput.value;
+
+    if (!withdrawAmount) {
+      alert('Please enter a valid withdraw amount');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('withdrawAmount', withdrawAmount);
+
+    try {
+      const response = await fetch('/accounts/withdraw', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to withdraw funds');
+      }
+
+      const data = await response.json();
+      alert(`Successfully withdrew $${data.withdrawAmount}`);
+      this.withdrawAmountInput.value = '';
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while withdrawing funds');
+    }
+  };
+}
+
+//
+class Transfer implements Transaction {
+  private recipientInput: HTMLInputElement;
+  private transferAmountInput: HTMLInputElement;
+
+  constructor() {
+    this.recipientInput = document.querySelector('#recipient');
+    this.transferAmountInput = document.querySelector('#transfer-amount');
+  }
+
+  execute = async () => {
+    const recipient = this.recipientInput.value;
+    const transferAmount = this.transferAmountInput.value;
+
+    if (!recipient || !transferAmount) {
+      alert('Please enter a valid recipient and transfer amount');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('recipient', recipient);
+    formData.append('transferAmount', transferAmount);
+
+    try {
+      const response = await fetch('/accounts/transfer', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to transfer funds');
+      }
+
+      const data = await response.json();
+      alert(`Successfully transferred $${data.transferAmount} to ${data.recipient}`);
+      this.recipientInput.value = '';
+      this.transferAmountInput.value = '';
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while transferring funds');
+    }
+  };
+}
+
+
+// Attach submit event listeners to the forms
+const depositForm = document.querySelector('.deposit-card form');
+depositForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const deposit = new Deposit();
+  deposit.execute();
+});
+
+const withdrawForm = document.querySelector('.withdraw-card form');
+withdrawForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const withdraw = new Withdraw();
+  withdraw.execute();
+});
+
+const transferForm = document.querySelector('.transfer-card form');
+transferForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const transfer = new Transfer();
+  transfer.execute();
+});
+
+
+    </script>
 {% endblock %}
