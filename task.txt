@@ -1,0 +1,7 @@
+pip install channels
+pip install channels-redis
+pip install pdfkit
+pip install tenacity
+pip install openai
+pip install python-decouple
+pip install drf-nested-routers

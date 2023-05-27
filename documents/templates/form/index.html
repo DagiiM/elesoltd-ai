@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  
+  .item {
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    background-color: var(--sidebar-color);
+  }
+  
+  .item a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 1rem;
+    text-align: center;
+    color: var(--text-color);
+    text-decoration: none;
+  }
+  
+  .item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  .item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+  }
+  
+  .item-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: var(--brand-color);
+}
+
+body.dark .item-icon svg {
+    fill: var(--text-color);
+}
+
+.item h3 {
+margin: 0;
+font-size: 1.0rem;
+font-weight: 500;
+line-height: 1.4;
+}
+  
+</style>
+
+
+  
+<section class='basic-content-container'>
+    <ul class="container">
+        <li class="item">
+            <a href="{% url 'business_plan' %}">
+              <div class="item-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M19.5,8h-15c-0.827,0-1.5,0.673-1.5,1.5v5c0,0.827,0.673,1.5,1.5,1.5h15c0.827,0,1.5-0.673,1.5-1.5v-5C21,8.673,20.327,8,19.5,8z M19,13h-14v-3h14V13z M18,10H6v1h12V10z M6,11v1h4v-1H6z M11,11v1h7v-1H11z M19,16H5v-1h14V16z"/>
+                </svg>
+              </div>
+              <h5>Create a Business Plan</h5>
+            </a>
+          </li>
+          <li class="item">
+            <a href="{% url 'resume' %}">
+              <div class="item-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M19.5,3h-15C3.673,3,3,3.673,3,4.5v15c0,0.827,0.673,1.5,1.5,1.5h15c0.827,0,1.5-0.673,1.5-1.5v-15C21,3.673,20.327,3,19.5,3z M8,8h8v1H8V8z M8,11h8v1H8V11z M8,14h6v1H8V14z M18,17H6v-1h12V17z M18,14H6v-1h12V14z M18,11H6v-1h12V11z M18,8H6v-1h12V8z"/>
+                </svg>
+              </div>
+              <h5>Create a Resume & Cover Letter</h5>
+            </a>
+          </li>
+          <li class="item">
+            <a href="{% url 'project_proposal' %}">
+              <div class="item-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M20,3H4C2.896,3,2,3.896,2,5v14c0,1.104,0.896,2,2,2h16c1.104,0,2-0.896,2-2V5C22,3.896,21.104,3,20,3z M4,5h4v4H4V5z M9,9H7V5h2V9z M20,19H4v-2h16V19z M20,15H4v-2h16V15z"/>
+                </svg>
+              </div>
+              <h5>Create a Project Proposal</h5>
+            </a>
+          </li>
+          <li class="item">
+            <a href="{% url 'project_report' %}">
+              <div class="item-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M20.5,3h-17C2.673,3,2,3.673,2,4.5v15C2,20.327,2.673,21,3.5,21h17c0.827,0,1.5-0.673,1.5-1.5v-15C22,3.673,21.327,3,20.5,3z M8,18h-3v-3h3V18z M8,13h-3v-3h3V13z M8,8h-3V5h3V8z M13,18H9v-3h4V18z M13,13H9v-3h4V13z M13,8H9V5h4V8z M18,18h-3v-3h3V18z M18,13h-3v-3h3V13z M18,8h-3V5h3V8z"/>
+                </svg>
+              </div>
+              <h5>Create a Project Report</h5>
+            </a>
+          </li>
+      </ul>
+      
+ 
+</section>
+
+<section class="card__container">
+    <h1 style="text-align:center;padding-bottom:5px;">My Documents</h1>
+    
+  </section>
+  
+  <script>
+    fetch('/api/document_sessions/')
+    .then(response => response.json())
+    .then(data => {
+      // The API data is now available as the 'data' variable.
+      const parentElement = document.querySelector('.card__container');
+  
+      // Check if data is empty
+      if (data.length === 0) {
+        const noDataMessage = document.createElement('p');
+        noDataMessage.textContent = 'No data available';
+        parentElement.appendChild(noDataMessage);
+      } else {
+        for (let i = 0; i < data.length; i++) {
+            // Retrieve the document_type and content attributes
+            const id = data[i].id;
+            const documentType = data[i].document_type;
+            let content = data[i].content;
+            let status = data[i].status;
+
+            const date = new Date(data[i].created_at);
+            const formattedDate = date.toLocaleString('en-GB', { timeZone: 'Africa/Nairobi' });
+
+            let created_at = formattedDate;
+        
+            // If the content is an object, retrieve its first attribute
+            if (typeof content === 'object') {
+              content = content[Object.keys(content)[0]];
+              if (typeof content === 'object') {
+                content = content[Object.keys(content)[0]];
+                content = JSON.stringify(content);
+              }
+            }
+        
+            // Create the card item element
+            const cardItem = document.createElement('a');
+            cardItem.setAttribute('href', `/api/document_sessions/${id}`);
+            cardItem.classList.add('card__item');
+        
+            // Create and append the title element
+            const titleElement = document.createElement('div');
+            titleElement.classList.add('card__item--title');
+            titleElement.textContent = documentType;
+            cardItem.appendChild(titleElement);
+        
+            // Create and append the description element
+            const descriptionElement = document.createElement('div');
+            descriptionElement.classList.add('card__item--description');
+            descriptionElement.textContent = content;
+            cardItem.appendChild(descriptionElement);
+        
+            // Create and append the time element
+            const timeElement = document.createElement('div');
+            timeElement.classList.add('card__item--time');
+            timeElement.textContent = created_at;
+            cardItem.appendChild(timeElement);
+        
+            // Append the card item to the parent element
+            parentElement.appendChild(cardItem);
+       
+        }
+      }
+      // Do something with the data...
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+  
+
+  </script>
+
+{% endblock %}

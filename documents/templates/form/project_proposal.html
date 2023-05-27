@@ -1,0 +1,220 @@
+
+<style>
+
+    form .form-nav {
+      /*display: flex;*/
+      justify-content: space-between;
+      margin-bottom: 20px;
+      margin-top:20px;
+    }
+   
+    form section {
+      display: none;
+    }
+    
+    form section:first-of-type {
+      display: block;
+    }
+  
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      grid-gap: 5px; 
+    }
+    
+    form section h2{
+      color:var(--brand-color);
+      margin-bottom:8px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+</style>
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class='basic-content-container resume-request-container'>
+    <h2> Create a Professional Project Proposal | Guide </h2>
+    <form id="resume-request" action="/api/document_sessions/" method="post">
+      {% csrf_token %}
+        <div class="form-nav grid">
+          <a href="#section1" class="active">1. Introduction</a>
+          <a href="#section2">2. Objectives</a>
+          <a href="#section3">3. Methodology</a>
+          <a href="#section4">4. Budget</a>
+          <a href="#section5">5. Timeline</a>
+          <a href="#section6">6. Conclusion</a>
+        </div>
+        
+        <!-- Section 1: Introduction -->
+        <section id="section1">
+          <h2>Section 1: Introduction</h2>
+          <div>
+            <label for="project-title">Project Title:</label><br>
+            <input type="text" id="project-title" name="project-title" placeholder="Enter the title of your project" required>
+          </div>
+          <div>
+            <label for="project-description">Project Description:</label><br>
+            <textarea id="project-description" name="project-description" rows="5" placeholder="Enter a brief description of your project" required></textarea>
+          </div>
+        </section>
+   <!-- Section 2: Objectives -->
+  <section id="section2">
+    <h2>Section 2: Objectives</h2>
+    <div>
+      <label for="project-objectives">Project Objectives:</label><br>
+      <textarea id="project-objectives" name="project-objectives" rows="5" placeholder="Enter the objectives of your project" required></textarea>
+    </div>
+</section>
+  
+  <!-- Section 3: Methodology -->
+  <section id="section3">
+    <h2>Section 3: Methodology</h2>
+    <div>
+      <label for="research-methods">Research Methods:</label><br>
+      <textarea id="research-methods" name="research-methods" rows="5" placeholder="Enter the research methods you will use for your project" required></textarea>
+    </div>
+</section>
+  
+  <!-- Section 4: Budget -->
+  <section id="section4">
+    <h2>Section 4: Budget</h2>
+    <div>
+      <label for="project-budget">Project Budget:</label><br>
+      <input type="number" id="project-budget" name="project-budget" placeholder="Enter the budget for your project" required>
+    </div>
+  </section>
+  
+  <!-- Section 5: Timeline -->
+  <section id="section5">
+    <h2>Section 5: Timeline</h2>
+    <div>
+      <label for="project-timeline">Project Timeline:</label><br>
+      <textarea id="project-timeline" name="project-timeline" rows="5" placeholder="Enter the timeline for your project" required></textarea>
+    </div>
+</section>
+  
+  <!-- Section 6: Conclusion -->
+  <section id="section6">
+    <h2>Section 6: Conclusion</h2>
+    <div>
+      <label for="project-conclusion">Project Conclusion:</label><br>
+      <textarea id="project-conclusion" name="project-conclusion" rows="5" placeholder="Enter your conclusion for the project" required></textarea>
+    </div>
+
+     <!-- Submit Button -->
+    <div style='margin:8px auto'>
+        <button type="submit" id="resume-request">
+            <span id='submit-button-text'>Checkout</span>
+            <img src="{% static 'icons/ripple.svg' %}" alt="loading" id="loading-data" style="display:none;">
+          </button>
+      </div>
+  </section>
+  
+ 
+</form>
+
+<script>
+    const navLinks = document.querySelectorAll(".form-nav> a");
+   const sections = document.querySelectorAll("form section");
+   const form = document.getElementById('resume-request');
+   const submitButton = form.querySelector("button[type='submit']");
+   
+   // Check whether all required fields in a section are filled out
+   function checkCompletion(section) {
+       const inputs = section.querySelectorAll("input[required], textarea[required]");
+       let completed = true;
+       inputs.forEach(input => {
+         if (input.value === "") {
+           completed = false;
+         }
+       });
+       return completed;
+     }
+   
+   navLinks.forEach(link => {
+     link.addEventListener("click", event => {
+       event.preventDefault();
+       navLinks.forEach(link => link.classList.remove("active"));
+       link.classList.add("active");
+       const target = document.querySelector(link.hash);
+       sections.forEach(section => {
+         if (section === target) {
+           section.style.display = "block";
+         } else {
+           section.style.display = "none";
+         }
+       });
+     });
+   });
+
+
+   
+   form.addEventListener("input", event => {
+       const target = event.target;
+       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+         const section = target.closest("section");
+         const navLink = document.querySelector(`.form-nav a[href="#${section.id}"]`);
+         navLink.setAttribute("data-completed", checkCompletion(section));
+       }
+     });
+  
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  const formData = {
+    "document_type": "Project Proposal",
+    "content": {
+      "title": document.getElementById('project-title').value,
+      "description": document.getElementById('project-description').value,
+      "objectives": document.getElementById('project-objectives').value,
+      "methodology": document.getElementById('research-methods').value,
+      "budget": document.getElementById('project-budget').value,
+      "timeline": document.getElementById('project-timeline').value,
+      "conclusion": document.getElementById('project-conclusion').value
+    }
+  };
+
+  createDocument('/api/document_sessions/', formData);
+});
+
+function createDocument(url, formData) {
+  // send the form data to the server
+  submitButton.innerText="Loading..."
+  submitButton.setAttribute('disabled', 'disabled');
+  submitButton.style.cursor = 'progress';
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+    },
+    body: JSON.stringify(formData),
+    credentials: 'same-origin', // include cookies in the request
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Failed to save document');
+    }
+    return response.json();
+  })
+  .then(data => {
+    showAlert("session saved","Document saved successfully")
+    submitButton.setAttribute('disabled', 'disabled');
+    submitButton.innerText="Submit Another"
+    submitButton.style.cursor = 'pointer';
+    return data;
+  })
+  .catch(error => {
+    console.error(error);
+    throw error;
+  });
+}
+
+  </script>
+    
+
+</section>
+{% endblock %}

@@ -1,19 +1,34 @@
 from django import forms
 from .models import Account
+from authentication.models import User     
+from django import forms
+from django.core.validators import RegexValidator
+from .models import Account
 
 class AccountForm(forms.ModelForm):
+    '''
+    account_number = forms.CharField(
+        validators=[RegexValidator(r'^\d+$', 'Account number must be a number')],
+    )
+    '''
+    balance = forms.DecimalField(disabled=True)
+    max_balance = forms.DecimalField(disabled=True)
+    #user = forms.ModelChoiceField(queryset=User.objects.all(), widget=forms.Select)
+
     class Meta:
         model = Account
-        fields = ['account_number', 'balance']
-        #fields = '__all__'
-        widgets = {
-            'user': forms.HiddenInput()
-        }
+        fields = ['account_type', 'status', 'currency']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['balance'].initial = 0.00
+        self.fields['max_balance'].initial = 9999999.00
+        self.fields['user'].label = 'User'
         
 class AccountUpdateForm(forms.ModelForm):
     class Meta:
         model = Account
-        fields = ['account_type', 'account_number', 'balance', 'currency',
+        fields = ['account_type', 'balance', 'currency',
                   'creation_date', 'status']
 
 

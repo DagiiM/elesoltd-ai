@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block content %}
-<section class='basic-content-container'>
-    <h2> Create a Professional Cover Letter | Guide </h2>
-
-</section>
-{% endblock %}

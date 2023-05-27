@@ -1,0 +1,373 @@
+
+<style>
+    /* Progress Bar */
+    #progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 15px;
+      margin-bottom:5px;
+    }
+    
+    #progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background-color: var(--brand-color);
+      border-radius: 10px;
+    }
+
+    .direction-buttons{
+        display:flex;
+        align-items: center;
+        justify-content: space-between;
+        margin:5px auto;
+    }
+    .direction-buttons button{
+        background-color: var(--brand-color);
+        color:var(--brand-neutral);
+        border:1px solid var(--brand-color);
+        padding:0.5rem 1rem;
+        border-radius:5px;
+    }
+    .direction-buttons button:hover{
+        background-color: var(--brand-color-alt);
+        border:1px solid var(--brand-color);
+        cursor:pointer;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      form > div,
+      form > table,
+      form > section {
+        width: 100%;
+      }
+    }
+    
+    form section h2{
+        color:var(--brand-color);
+        margin-top:20px;
+        margin-bottom:12px;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+</style>
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class='basic-content-container general-form-container'>
+    <h2> Create a Professional Business Plan | Guide </h2>
+    <form id="business-plan-form" method="post" action="" class="general-form">
+      {% csrf_token %}
+        <!-- Progress Bar -->
+        <div id="progress-bar">
+          <div id="progress-bar-fill"></div>
+        </div>
+        
+        <!-- Section 1: Executive Summary -->
+        <section id="section1">
+          <h2>Section 1: Executive Summary</h2>
+          <div>
+            <label for="executive-summary">Executive Summary:</label><br>
+            <textarea id="executive-summary" name="executive-summary" rows="5" required placeholder="Enter a brief overview of the business, its goals, and its key points" required></textarea>
+          </div>
+          <div class="direction-buttons">
+            <button type="button" id="next-button">Next</button>
+          </div>
+        </section>
+        
+        <!-- Section 2: Company Description -->
+        <section id="section2">
+          <h2>Section 2: Company Description</h2>
+          <div>
+            <label for="company-description">Company Description:</label><br>
+            <textarea id="company-description" name="company-description" rows="5" required placeholder="Enter a more detailed description of the business, including its history, products or services, target market, and competitive advantage" required></textarea>
+          </div>
+          <div class="direction-buttons">
+            <button type="button" id="previous-button">Previous</button>
+            <button type="button" id="next-button">Next</button>
+          </div>
+        </section>
+        
+        <!-- Section 3: Market Analysis -->
+        <section id="section3">
+          <h2>Section 3: Market Analysis</h2>
+          <div>
+            <label for="market-analysis">Market Analysis:</label><br>
+            <textarea id="market-analysis" name="market-analysis" rows="5" required placeholder="Enter an assessment of the market in which the business operates, including market size, trends, and competitors" required></textarea>
+          </div>
+          <div class="direction-buttons">
+            <button type="button" id="previous-button">Previous</button>
+            <button type="button" id="next-button">Next</button>
+          </div>
+        </section>
+        
+        <!-- Section 4: Product or Service Offering -->
+        <section id="section4">
+          <h2>Section 4: Product or Service Offering</h2>
+          <div>
+            <label for="product-service-offering">Product or Service Offering:</label><br>
+            <textarea id="product-service-offering" name="product-service-offering" rows="5" required placeholder="Enter a description of the products or services offered by the business, including any unique features or benefits" required></textarea>
+          </div>
+          <div class="direction-buttons">
+            <button type="button" id="previous-button">Previous</button>
+            <button type="button" id="next-button">Next</button>
+          </div>
+        </section>
+        
+
+  <!-- Section 5: Marketing and Sales Strategy -->
+  <section id="section5">
+    <h2>Section 5: Marketing and Sales Strategy</h2>
+    <div>
+      <label for="marketing-sales-strategy">Marketing and Sales Strategy:</label><br>
+      <textarea id="marketing-sales-strategy" name="marketing-sales-strategy" rows="5" required placeholder="Enter a detailed plan for how the business will reach and sell to its target market, including pricing, promotion, and distribution strategies" required></textarea>
+    </div>
+    <div class="direction-buttons">
+        <button type="button" id="previous-button">Previous</button>
+        <button type="button" id="next-button">Next</button>
+      </div>
+  </section>
+  
+    <!-- Section 6: Operations -->
+    <section id="section6">
+        <h2>Section 6: Operations</h2>
+        <div>
+          <label for="operations">Operations:</label><br>
+          <textarea id="operations" name="operations" rows="5" required placeholder="Enter a description of how the business will operate, including details on production, delivery, and customer service" required></textarea>
+        </div>
+        <div class="direction-buttons">
+            <button type="button" id="previous-button">Previous</button>
+            <button type="button" id="next-button">Next</button>
+          </div>
+      </section>
+      
+      <!-- Section 7: Management Team -->
+      <section id="section7">
+        <h2>Section 7: Management Team (Optional)</h2>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Experience</th>
+            <th>Qualifications</th>
+          </tr>
+          <tr>
+            <td><input type="text" id="name1" name="name1" placeholder="Enter name" required></td>
+            <td><input type="text" id="experience1" name="experience1" placeholder="Enter experience" required></td>
+            <td><input type="text" id="qualifications1" name="qualifications1" placeholder="Enter qualifications" required></td>
+          </tr>
+          <tr>
+            <td><input type="text" id="name2" name="name2" placeholder="Enter name"></td>
+            <td><input type="text" id="experience2" name="experience2" placeholder="Enter experience"></td>
+            <td><input type="text" id="qualifications2" name="qualifications2" placeholder="Enter qualifications"></td>
+          </tr>
+          <tr>
+            <td><input type="text" id="name3" name="name3" placeholder="Enter name"></td>
+            <td><input type="text" id="experience3" name="experience3" placeholder="Enter experience"></td>
+            <td><input type="text" id="qualifications3" name="qualifications3" placeholder="Enter qualifications"></td>
+          </tr>
+        </table>
+        <div class="direction-buttons">
+            <button type="button" id="previous-button">Previous</button>
+            <button type="button" id="next-button">Next</button>
+          </div>
+      </section>
+      
+  <!-- Section 8: Financial Plan -->
+  <section id="section8">
+    <h2>Section 8: Financial PlanTeam (Optional)</h2>
+    <div>
+      <label for="financial-plan">Financial Plan:</label><br>
+      <textarea id="financial-plan" name="financial-plan" rows="5" placeholder="Enter a projection of the business's financial performance, including revenue, expenses, and profitability. This may include financial statements and other supporting documents" required></textarea>
+    </div>
+    <div class="direction-buttons">
+        <button type="button" id="previous-button">Previous</button>
+        <button type="button" id="next-button">Next</button>
+      </div>
+  </section>
+  
+  <!-- Section 9: Appendices -->
+  <section id="section9">
+    <h2> Section 9: Appendices Team (Optional)</h2>
+    <div>
+      <label for="appendices">Appendices:</label><br>
+      <input type="file" id="appendices" name="appendices" multiple disabled>
+    </div>
+    <div class="direction-buttons">
+        <button type="button" id="previous-button">Previous</button>
+        <button type="submit" style="width:fit-content;padding:8px 10px;height:fit-content;font-size:12px">Checkout</button>
+      </div>
+  </section>
+  
+
+</form>
+
+</form>
+ 
+</section>
+
+<!-- JavaScript to handle form submission -->
+
+<script type="module" src="{% static 'js/utils.js' %}"></script>
+
+<script>
+
+// Get form, sections, and buttons
+const form = document.getElementById("business-plan-form");
+const sections = form.querySelectorAll("section");
+const nextButtons = form.querySelectorAll("#next-button");
+const previousButtons = form.querySelectorAll("#previous-button");
+const submitButton = form.querySelector("button[type='submit']");
+const progressBar = document.getElementById("progress-bar-fill");
+
+// Get the submit button element
+//const submitButton = form.querySelector('button[type="submit"]');
+
+// Get all required fields
+const requiredFields = form.querySelectorAll('[required]');
+
+// Add input event listener to all required fields
+
+
+// Keep track of current section
+let currentSection = 0;
+
+// Function to update progress bar
+const updateProgressBar = () => {
+  // Calculate width of progress bar fill
+  const progress = (currentSection + 1) / sections.length * 100;
+  
+  // Update width of progress bar fill
+  progressBar.style.width = progress + "%";
+};
+
+// Function to show current section
+const showCurrentSection = () => {
+  // Hide all sections
+  sections.forEach(section => {
+    section.style.display = "none";
+  });
+  
+  // Show current section
+  sections[currentSection].style.display = "block";
+  
+  // Update progress bar
+  updateProgressBar();
+};
+
+// Function to go to next section
+const goToNextSection = () => {
+    // Increment current section
+    currentSection++;
+    
+    // If last section, show submit button
+    if (currentSection === sections.length - 1) {
+      submitButton.style.display = "block";
+    }
+    
+    // Show current section
+    showCurrentSection();
+  };
+  
+  // Function to go to previous section
+  const goToPreviousSection = () => {
+    // Decrement current section
+    currentSection--;
+    
+    // If not last section, hide submit button
+    if (currentSection !== sections.length - 1) {
+      submitButton.style.display = "none";
+    }
+    
+    // Show current section
+    showCurrentSection();
+  };
+  
+  // Add event listeners to buttons
+  nextButtons.forEach(button => {
+    button.addEventListener("click", goToNextSection);
+  });
+  // Bind goToPrevSection function to "Back" button's click event
+  previousButtons.forEach(button => {
+    button.addEventListener("click", goToPreviousSection);
+  });
+  
+  // Show first section by default
+  showCurrentSection();
+ 
+
+// get references to the form and its input fields
+//const form = document.getElementById('business-plan-form');
+const executiveSummaryInput = document.getElementById('executive-summary');
+const companyDescriptionInput = document.getElementById('company-description');
+const marketAnalysisInput = document.getElementById('market-analysis');
+const serviceOfferedInput = document.getElementById('product-service-offering');
+const marketingStrategyInput = document.getElementById('marketing-sales-strategy');
+//const managementTeamInput = document.getElementById('management');
+
+// add an event listener to the form's submit button
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  // create an object to store the form data
+  const formData = {
+    document_type: 'Business Plan',
+    content: {
+      executive_summary: executiveSummaryInput.value,
+      company_description: companyDescriptionInput.value,
+      market_analysis: marketAnalysisInput.value,
+      service_offered: serviceOfferedInput.value,
+      marketing_strategy: marketingStrategyInput.value,
+      //management_team: managementTeamInput.value
+    }
+  };
+
+  // send the form data to the server
+  createDocument('/api/document_sessions/', formData);
+
+});
+
+
+function createDocument(url, formData) {
+  // send the form data to the server
+  submitButton.innerText="Loading..."
+  submitButton.setAttribute('disabled', 'disabled');
+  submitButton.style.cursor = 'progress';
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+    },
+    body: JSON.stringify(formData),
+    credentials: 'same-origin', // include cookies in the request
+  })
+  .then(response => {
+    submitButton.innerText="Processing..."
+    if (!response.ok) {
+      throw new Error('Failed to save document');
+    }
+    return response.json();
+  })
+  .then(data => {
+    showAlert("session saved","Document saved successfully")
+    submitButton.setAttribute('disabled', 'disabled');
+    submitButton.innerText="Submit Another"
+    submitButton.style.cursor = 'pointer';
+    //console.log('Document saved:', data);
+    return data;
+  })
+  .catch(error => {
+    console.error(error);
+    throw error;
+  });
+}
+
+
+
+</script>
+{% endblock %}

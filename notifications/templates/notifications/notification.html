@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="card__container">
+  <h1 style="text-align:center;padding-bottom:5px;">Notifications</h1>
+  <a href="#" class="card__item">
+    <div class="card__item--title">Notification Title</div>
+    <div class="card__item--description">Ubuntu Pro Desktop is a comprehensive subscription delivering enterprise-grade security, management tooling, and extended support for developers and organisations. Ubuntu Pro Desktop is free for personal use on up to five machines.</div>
+    <div class="card__item--time">8:00am</div>
+  </a>    
+</section>
+
+
+    {{ room_name|json_script:"room-name" }}
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        const notificationSocket = new WebSocket('ws://' + window.location.host  + '/ws/notifications/' + roomName + '/');
+
+        notificationSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+           //document.querySelector('#chat-log').value += (data.message + '\n');
+        };
+
+        notificationSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+  </script>
+{% endblock %}

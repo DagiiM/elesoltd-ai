@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Business Plan</title>
+    <style>
+    :root {
+        /* Other variables */
+        --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        --text-color: #333;
+        --link-color: #0066cc;
+        }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-family: var(--font-stack);
+                font-weight: bold;
+                color: var(--text-color);
+                margin: 10pt 0 5pt 0;
+            }
+            
+            p {
+                font-family: var(--font-stack);
+                font-size: 12pt;
+                color: var(--text-color);
+                margin: 0 0 10pt 0;
+            }
+        
+        a {
+            font-family: var(--font-stack);
+            font-size: 12pt;
+            color: var(--link-color);
+            text-decoration: none;
+        }
+        
+        ul, ol {
+            font-family: var(--font-stack);
+            font-size: 12pt;
+            color: var(--text-color);
+            margin: 0 0 10pt 20pt;
+            padding: 0;
+        }
+        
+        li {
+            font-family: var(--font-stack);
+            font-size: 12pt;
+            color: var(--text-color);
+            margin: 0 0 5pt 0;
+            padding: 0;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        th, td {
+            font-family: var(--font-stack);
+            font-size: 12pt;
+            color: var(--text-color);
+            border: 1px solid #ddd;
+            padding: 8pt;
+        }
+        
+        th {
+            font-weight: bold;
+            background-color: #ddd;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        blockquote {
+            font-family: var(--font-stack);
+            font-size: 12pt;
+            color: var(--text-color);
+            font-style: italic;
+            margin: 0 0 10pt 20pt;
+            padding: 0;
+            border-left: 5px solid #ddd;
+        }
+        
+        code {
+            font-family: monospace;
+            font-size: 12pt;
+            color: #333;
+            background-color: #eee;
+            padding: 0 2pt;
+        }
+        
+        pre {
+            font-family: monospace;
+            font-size: 12pt;
+            color: #333;
+            background-color: #eee;
+            padding: 10pt;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+        }
+        .pdf-container{
+            margin:10px;
+            padding:10px;
+        }
+        h1{
+            font-size:40px;
+            line-height:1.4;
+        }
+        h2{
+            font-size:20px;
+            line-height:1.4;
+        }
+        p,li,td,th{
+            font-size:18px;
+            line-height:1.6;
+        }
+      
+
+        .styled-table{
+            border-collapse: collapse;
+            margin:25px 0;
+            font-size:18px;
+            font-family:sans-serif;
+            min-width:400px;
+            box-shadow:0 0 20px rgba(0,0,0,0.15)
+        }
+
+        .styled-table thead tr{
+            background-color: #0700FE;
+            color: #fff;
+            text-align:left;
+        }
+        .styled-table th,.styled-table td{
+            padding:12px 15px;
+        }
+        .styled-table tbody tr{
+            border-bottom:1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:last-of-type{
+            border-bottom:1px solid #0700FE;
+        }
+        tr{
+            page-break-inside: avoid;
+        }
+        .col-75{
+            float:left;
+            width:75%;
+        }
+        .col-25{
+            float:left;
+            width:25%;
+        }
+        .col-33{
+            float: left;
+            width: 33%;
+        }
+        /* clear floats after the columns */
+        .row:after{
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+
+
+
+
+    </style>
+  </head>
+  <body>
+    <section class="pdf-container">
+        <!-- Building Business Plan Here -->
+        <h1>Business Plan Document</h1>
+        <p><strong>Company Name : </strong>{{business_name|safe}}</p>
+        <p><strong>Date : </strong>{{date|date}}</strong></p>
+        <hr>
+        <h1>Company Description</h1>
+        <p>{{company_description|safe}}</p>
+        <br>
+        <h1>Market Analysis</h1>
+        <p>{{market_analysis|safe}}</p>
+        <br>
+        <h1>SWOT Analysis</h1>
+        <p>{{swot_analysis|safe}}</p>
+        <br>
+        <h1>Product Details</h1>
+        <p>{{product_detail|safe}}</p>
+        <br>
+        <h1>Company Description</h1>
+        <p>{{marketing_strategy|safe}}</p>
+
+    </section>
+
+  </body>
+</html>

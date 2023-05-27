@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  .section-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .preview-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    width: 200px;
+    border: 1px solid #ccc;
+  }
+  
+  .form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .form__input {
+    display: none;
+  }
+  
+  .form__button {
+    display: inline-block;
+    padding: 0.5em 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .form__button--original-image-upload {
+    background-color: #fff;
+    color: #333;
+  }
+  
+  .form__loading {
+    display: inline;
+    height: 1em;
+    vertical-align: middle;
+  }
+  
+  .preview-container__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 30px;
+    width: 100%;
+    margin-top: 3px;
+  }
+  
+  .preview-container__footer-text {
+    color: #333;
+  }
+  
+  .preview-container__footer-button {
+    display: inline-block;
+    padding: 0.5em 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #fff;
+    color: #333;
+  }
+  
+  .icon-file_download {
+    font-size: 1em;
+  }
+  
+</style>
+
+<section class="image-gallery">
+    <div class="image-card">
+      <img src="{% static 'icons/avatar.svg'%}" alt="Original Image" id="original_image_preview" class="image-card__image" />
+
+    <form class="form" id="image-upload-form" action="{% url 'bg-remover' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" class="form__input form__input--original-image" id="original_image" name="original_image" required pattern=".*\.(jpg|jpeg|png)$" style="display: none;">
+      <button type="button" class="form__button form__button--original-image-upload" id="original_image_button">Select Image</button>
+      <button type="submit" class="form__button form__button--submit" id="send-upload-request">
+        Remove Background
+        <img src="" alt="loading" class="form__loading" id="loading-data" style="display: none;">
+      </button>
+    </form>
+    </div>
+
+    <div class="image-card">
+    
+         <img src="{% static 'icons/avatar.svg'%}" alt="Output Image" id="output_image_preview" class="image-card__image" />
+    
+      <footer class="preview-container__footer">
+        <span class="preview-container__footer-text">Output Image</span>
+        <button type="button" class="preview-container__footer-button" id="download_output_image">
+          <i class="icon-file_download"></i>
+        </button>
+      </footer>
+    </div>
+
+</section>
+
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Select image button
+    const originalImageButton = document.getElementById('original_image_button');
+    originalImageButton.addEventListener('click', () => {
+      document.getElementById('original_image').click();
+    });
+  
+    // Image preview
+    const originalImageInput = document.getElementById('original_image');
+    originalImageInput.addEventListener('change', () => {
+      const originalImagePreview = document.getElementById('original_image_preview');
+      const file = originalImageInput.files[0];
+      const reader = new FileReader();
+  
+      reader.addEventListener('load', () => {
+        originalImagePreview.src = reader.result;
+      });
+  
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    });
+  
+    // Form submit
+    const form = document.getElementById('image-upload-form');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+  
+      const submitButton = document.getElementById('send-upload-request');
+      const loadingIndicator = document.getElementById('loading-data');
+      const outputImagePreview = document.getElementById('output_image_preview');
+      const downloadButton = document.getElementById('download_output_image');
+  
+      submitButton.style.display = 'none';
+      loadingIndicator.style.display = 'inline';
+  
+      const formData = new FormData(form);
+      fetch(form.action, {
+        method: form.method,
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+        },
+        body: formData,
+      })
+        .then((response) => response.blob())
+        .then((blob) => {
+          console.log(blob);
+          const url = URL.createObjectURL(blob);
+          outputImagePreview.src = url;
+          downloadButton.addEventListener('click', () => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'output.png';
+            a.click();
+          });
+        })
+        .finally(() => {
+          submitButton.style.display = 'inline';
+          loadingIndicator.style.display = 'none';
+        });
+    });
+  });
+  
+
+</script>
+
+{% endblock %}

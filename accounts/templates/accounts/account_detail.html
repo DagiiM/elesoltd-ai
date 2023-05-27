@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="wallet-container">
+<header class="balance-card">
+    <div class="" style="display:flex;align-items:center;justify-content:space-between">
+        <p>Account number: {{ object.account_number }}</p>
+        <p>Account balance: {{ object.balance }}</p>
+  </div>
+  <a href="{% url 'accounts:account_update' object.pk %}">Update account</a>
+  </header>
+</section>
+
+  <section class="card__container">
+    <h3 style="text-align:center;padding-bottom:5px;">Transaction History (Last 15)</h3>
+    {% for transaction in transactions %}
+    <a href="#" class="card__item">
+      <div class="card__item--title">{{ transaction.amount }}</div>
+      <div class="card__item--description">Ref No - {{ transaction.reference_number }}, {{ transaction.description }}</div>
+      <div class="card__item--time">{{ transaction.created_at }}</div>
+    </a>  
+    {% endfor %}  
+</section>
+   
+   
+{% endblock %}

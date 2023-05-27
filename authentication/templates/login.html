@@ -1,0 +1,186 @@
+{% extends "guest.html" %}
+{% load static %}
+{% block title%}
+    Login
+{% endblock %}
+{% block style %}
+/* Styles for the form container */
+.login-container {
+    max-width: 400px;
+    width:40%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+
+    /* Center the container horizontally */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+@media (max-width: 768px) {
+    .login-container {
+        max-width:98%;
+        width:80%;
+    }
+}
+@media (max-width: 480px) {
+    .login-container {
+        max-width:98%;
+        width:96%;
+    }
+}
+
+
+/* Styles for the form header */
+.login-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333333;
+}
+
+/* Styles for the form fields */
+.login-field {
+  margin-bottom: 15px;
+}
+
+.login-field label {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 5px;
+}
+
+.login-field input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #cccccc;
+}
+
+/* Styles for the submit button */
+.login-submit {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: var(--brand-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top:15px;
+}
+
+/* Styles for error messages */
+.login-error {
+  color: #ff0000;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+  
+{% endblock %}
+
+{% block content %}
+<section>
+<div class="login-container">
+    <div class="login-header">
+      <h2>Login</h2>
+    </div>
+    <form id="login-form" method="POST" action="/api/users/login/">
+        {% csrf_token %}
+      <div class="login-field">
+        <label for="username">Username/Email/Phone Number</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username, email, or phone number" required>
+      </div>
+      <div class="login-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+      </div>
+
+      <div class="" style="display:flex;justify-content:space-between;align-items:center;padding-inline: 2%;">
+        <a href="{% url 'register' %}" style="">Create Account</a>
+        <a href="{% url 'view_forgot_password' %}" style="">Forgot Password</a>
+      </div>
+      
+      <button type="submit" class="login-submit">Login</button>
+      <div class="login-error" id="login-error"></div>
+    </form>
+  </div>
+</section>
+
+{% endblock %}
+
+  {% block js%}
+  const form = document.querySelector("#login-form");
+
+  // Get the submit button element
+const submitButton = form.querySelector('button[type="submit"]');
+
+// Get all required fields
+const requiredFields = form.querySelectorAll('[required]');
+
+// Add input event listener to all required fields
+requiredFields.forEach((field) => {
+  field.addEventListener('input', () => {
+    // Disable the submit button if any required field is empty
+    let allFieldsFilled = true;
+    requiredFields.forEach((field) => {
+      if (!field.value) {
+        allFieldsFilled = false;
+      }
+    });
+    if (allFieldsFilled) {
+      submitButton.removeAttribute('disabled');
+    } else {
+      submitButton.setAttribute('disabled', true);
+    }
+  });
+});
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+  
+    const username = form.username.value;
+    const password = form.password.value;
+  
+    try {
+      const response = await fetch("/api/users/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        showAlert("success","Login successful");
+        window.location.href = '/dashboard';
+      } else {
+        showAlert("failed","Login failed. Please check your details.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
+  
+
+  {% endblock %}

@@ -2,7 +2,6 @@
 <aside class='aside'>
     <ul>
       <li class="brand-aside-nav" style="background-color:transparent">
-
           <img src="{% static 'icons/logo.png' %}" alt="site-logo" style="width:var(--nav-height);height:var(--nav-height)"/>
           <span class="text" style="font-size:20px">Eleso Ltd</span>
 
@@ -50,19 +49,6 @@
           </a>
         </li>
 
-        <li>
-          <a href="{% url 'generate-image' %}">
-            <i class="icon icon-add_photo_alternate"></i>
-            <span class="text">Image Generator</span>
-          </a>
-        </li>
-
-        <li>
-          <a href="{% url 'bg-remover' %}">
-            <i class="icon icon-brush"></i>
-            <span class="text">Remove Bg</span>
-          </a>
-        </li>
 
         <li>
           <a href="{% url 'document' %}">
@@ -74,7 +60,7 @@
 
  {% if user.is_authenticated %}
       <li>
-        <a href="{% url 'accounts:account_list' %}">
+        <a href="">
         <i class="icon icon-account_balance_wallet"></i>
         <span class="text">My Wallet</span>
       </a>
@@ -83,34 +69,46 @@
  {% endif %}
 
     </ul>
-    <ul>
-       <li>
+
+    <ul style="margin-top: 10px;">
+             
+        {% if user.is_authenticated %}
+        <li>
           <a href="{% url 'support_request' %}">
             <i class="icon icon-support_agent"></i>
             <span class="text">Support</span>
           </a>
         </li>
-
         <li>
-          <a href="{% url 'support_request' %}">
+          <a href="{% url 'view_logout' %}">
             <i class="icon icon-logout"></i>
             <span class="text">Logout</span>
           </a>
         </li>
+          {% else %}
+          <li>
+            <a href="{% url 'register' %}">
+              <i class="icon icon-support_agent"></i>
+              <span class="text">Create Account</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'view_login' %}">
+              <i class="icon icon-login"></i>
+              <span class="text">Login</span>
+            </a>
+          </li>
+      {% endif %}
 
         <li class="mode">
-
             <div class="moon-sun">
               <i class="icon icon-support_agent moon"></i>
               <i class="icon icon-wb_sunny sun"></i>
             </div>
-            
             <span class="mode-text text">Dark Mode</span>
-
             <div class="toggle-switch">
               <span class="switch"></span>
             </div>
-
         </li>
 
      </ul>

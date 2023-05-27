@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>My Resume</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+
+        /* Global styles */
+        * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
+        
+        body {
+          font-family: sans-serif;
+        }
+        
+        ul {
+          list-style: none;
+        }
+        
+        header {
+          background-color: #333;
+          color: #fff;
+          padding: 20px;
+        }
+        
+        h1 {
+          font-size: 2.5em;
+          margin-bottom: 0;
+        }
+        
+        h2 {
+          font-size: 1.5em;
+          margin-bottom: 10px;
+        }
+        
+        h3 {
+          font-size: 1.2em;
+          margin-bottom: 5px;
+        }
+        
+        p, li {
+          font-size: 1em;
+          line-height: 1.5;
+        }
+        
+        ul li {
+          margin-bottom: 5px;
+        }
+        
+        ul li:last-child {
+          margin-bottom: 0;
+        }
+        
+        ul li span {
+          font-weight: bold;
+        }
+        
+        /* Specific styles */
+        .header-content {
+          max-width: 600px;
+          margin: 0 auto;
+          text-align: center;
+        }
+        
+        ul li i {
+          font-size: 1.2em;
+          color: #ccc;
+        }
+        
+        ul li i:hover {
+          color: #fff;
+        }
+        
+        ul li:last-child {
+          margin-bottom: 10px;
+        }
+        
+        section {
+          max-width: 600px;
+          margin: 20px auto;
+          padding: 20px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+        }
+        
+        section ul li i {
+          font-size: 1em;
+          margin-right: 10px;
+          color: #333;
+        }
+        
+        section ul li:last-child {
+          margin-bottom: 0;
+        }
+        
+        .skills li {
+          display: inline-block;
+          margin-right: 10px;
+          font-size: 1.2em;
+        }
+        
+        .skills li i {
+          margin-right: 5px;
+        }
+        
+        
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <h1>John Doe</h1>
+        <p>Web Developer</p>
+        <ul>
+          <li><i class="fas fa-envelope"></i> john.doe@example.com</li>
+          <li><i class="fas fa-phone"></i> 555-1234</li>
+        </ul>
+      </div>
+    </header>
+
+    <main>
+      <section>
+        <h2>Education</h2>
+        <ul>
+          <li>
+            <h3>B.S. Computer Science</h3>
+            <p><span>University of California, Los Angeles</span>, 2015-2019</p>
+            <ul>
+              <li>Coursework: Data Structures, Algorithms, Operating Systems</li>
+              <li>Honors: Cum Laude</li>
+            </ul>
+          </li>
+          <li>
+            <h3>Web Development Bootcamp</h3>
+            <p><span>General Assembly</span>, 2020</p>
+            <ul>
+              <li>Skills: HTML/CSS, JavaScript, React, Node.js</li>
+              <li>Project: Built a full-stack e-commerce website using MERN stack</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Experience</h2>
+        <ul>
+          <li>
+            <h3>Web Developer</h3>
+            <p><span>Acme Inc.</span>, June 2020 - Present</p>
+            <ul>
+              <li>Developed and maintained multiple e-commerce websites using React and Node.js</li>
+              <li>Collaborated with designers and project managers to implement new features and optimize website performance</li>
+              <li>Skills: React, Node.js, Express, MongoDB, HTML/CSS</li>
+              <li>Project: Redesigned the checkout process, resulting in a 20% increase in completed purchases</li>
+            </ul>
+          </li>
+          <li>
+            <h3>Software Engineer Intern</h3>
+            <p><span>Google</span>, Summer 2018</p>
+            <ul>
+              <li>Worked on the development of a machine learning algorithm for detecting spam in Gmail</li>
+              <li>Collaborated with other interns and full-time engineers to optimize performance and accuracy of the algorithm</li>
+              <li>Skills: Python, TensorFlow, SQL</li>
+              <li>Project: Built a tool for analyzing false positives in the spam detection algorithm, reducing the number of false positives by 30%</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Skills</h2>
+        <ul>
+          <li><i class="fab fa-html5"></i> HTML/CSS</li>
+          <li><i class="fab fa-js-square"></i> JavaScript</li>
+          <li><i class="fab fa-react"></i> React</li>
+          <li><i class="fab fa-node-js"></i> Node.js</li>
+          <li><i class="fab fa-python"></i> Python</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>
